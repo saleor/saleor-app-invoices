@@ -47,3 +47,4 @@ generated/
 
 # Sentry
 .sentryclirc
+test-invoice.pdf

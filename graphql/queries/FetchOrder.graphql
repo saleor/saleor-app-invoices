@@ -1,0 +1,5 @@
+query FetchOrder($id: String!) {
+  order(id: $id) {
+    id # todo all fields
+  }
+}
