@@ -29,7 +29,10 @@ export class MicroinvoiceInvoiceGenerator implements InvoiceGenerator {
             },
             {
               label: "Date",
-              value: order.created,
+              value: Intl.DateTimeFormat("pl-PL", {
+                dateStyle: "medium",
+                timeStyle: 'medium'
+              }).format(new Date(order.created)),
             },
           ],
 

@@ -38,7 +38,7 @@ const mockOrder: Order = {
   },
   chargeStatus: OrderChargeStatusEnum.Full,
   collectionPointName: undefined,
-  created: undefined,
+  created: "2022-11-22T11:54:59.373555+00:00",
   customerNote: "",
   deliveryMethod: undefined,
   discount: undefined,
