@@ -69,20 +69,20 @@ export const handler: NextWebhookApiHandler<InvoiceRequestedPayloadFragment> = a
     });
   }
 
-  const hashedInvoiceName = hashInvoiceFilename(invoiceName, orderId);
-  const hashedInvoiceFileName = `${hashedInvoiceName}.pdf`;
-  const tempPdfLocation = resolveTempPdfFileLocation(hashedInvoiceFileName);
-
-  await new MicroinvoiceInvoiceGenerator().generate(order, tempPdfLocation).catch((err) => {
-    console.error("Error generating invoice");
-    console.error(err);
-
-    return res.status(500).json({
-      error: "Error generating invoice",
-    });
-  });
-
   try {
+    const hashedInvoiceName = hashInvoiceFilename(invoiceName, orderId);
+    const hashedInvoiceFileName = `${hashedInvoiceName}.pdf`;
+    const tempPdfLocation = resolveTempPdfFileLocation(hashedInvoiceFileName);
+
+    await new MicroinvoiceInvoiceGenerator().generate(order, tempPdfLocation).catch((err) => {
+      console.error("Error generating invoice");
+      console.error(err);
+
+      return res.status(500).json({
+        error: "Error generating invoice",
+      });
+    });
+
     const client = createClient(`https://${authData.domain}/graphql/`, async () =>
       Promise.resolve({ token: authData.token })
     );
