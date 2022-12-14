@@ -19,6 +19,7 @@ specifiers:
   '@types/react-dom': ^18.0.6
   '@types/rimraf': ^3.0.2
   '@urql/exchange-auth': ^1.0.0
+  '@urql/exchange-multipart-fetch': ^1.0.1
   '@vitejs/plugin-react': ^3.0.0
   '@vitest/coverage-c8': ^0.25.7
   eslint: 8.25.0
@@ -46,6 +47,7 @@ dependencies:
   '@saleor/app-sdk': 0.24.0_azq6kxkn3od7qdylwkyksrwopy
   '@saleor/macaw-ui': 0.7.0_k2kuy4f2rkqfztjzphbs3himfi
   '@urql/exchange-auth': 1.0.0_graphql@16.6.0
+  '@urql/exchange-multipart-fetch': 1.0.1_graphql@16.6.0
   graphql: 16.6.0
   graphql-tag: 2.12.6_graphql@16.6.0
   microinvoice: 1.0.6
@@ -2304,6 +2306,17 @@ packages:
       wonka: 6.1.0
     dev: false
 
+  /@urql/exchange-multipart-fetch/1.0.1_graphql@16.6.0:
+    resolution: {integrity: sha512-fjxRrKR/D9Rs52L8wJMvqsGQBC/mjFcg/VdkSkU5IXmqCb5KmicXl2208hoCnaBl/QLA6NDpCNnG3zjDniMOTg==}
+    peerDependencies:
+      graphql: ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
+    dependencies:
+      '@urql/core': 3.0.3_graphql@16.6.0
+      extract-files: 11.0.0
+      graphql: 16.6.0
+      wonka: 6.1.0
+    dev: false
+
   /@urql/introspection/0.3.3_graphql@16.6.0:
     resolution: {integrity: sha512-tekSLLqWnusfV6V7xaEnLJQSdXOD/lWy7f8JYQwrX+88Md+voGSCSx5WJXI7KLBN3Tat2OV08tAr8UROykls4Q==}
     peerDependencies:
@@ -3746,7 +3759,6 @@ packages:
   /extract-files/11.0.0:
     resolution: {integrity: sha512-FuoE1qtbJ4bBVvv94CC7s0oTnKUGvQs+Rjf1L2SJFfS+HTVVjhPFtehPdQ0JiGPqVNfSSZvL5yzHHQq2Z4WNhQ==}
     engines: {node: ^12.20 || >= 14.13}
-    dev: true
 
   /extract-files/9.0.0:
     resolution: {integrity: sha512-CvdFfHkC95B4bBBk36hcEmvdR2awOdhhVUYH6S/zrVj3477zven/fJMYg7121h4T1xHZC+tetUpubpAhxwI7hQ==}
