@@ -1,5 +1,5 @@
 import { Client, gql } from "urql";
-import { InvoiceCreateMutationVariables, InvoiceCreateMutation } from "../../../generated/graphql";
+import { InvoiceCreate, InvoiceCreateInput } from "../../../generated/graphql";
 
 const InvoiceCreateMutation = gql`
   mutation InvoiceCreate($orderId: ID!, $invoiceInput: InvoiceCreateInput!) {
@@ -20,15 +20,18 @@ export class InvoiceCreateNotifier {
   notifyInvoiceCreated(orderId: string, invoiceNumber: string, invoiceUrl: string) {
     return (
       this.client
-        .mutation<InvoiceCreateMutation, InvoiceCreateMutationVariables>(InvoiceCreateMutation, {
-          orderId,
-          invoiceInput: {
-            url: invoiceUrl,
-            number: invoiceNumber,
-          },
-        })
+        // TODO Why these generated types are missing
+        .mutation<InvoiceCreate, { orderId: string; invoiceInput: InvoiceCreateInput }>(
+          InvoiceCreateMutation,
+          {
+            orderId,
+            invoiceInput: {
+              url: invoiceUrl,
+              number: invoiceNumber,
+            },
+          }
+        )
         .toPromise()
-        // todo fix types
         .then((result) => {
           console.log("invoiceCreate result");
           console.log(result.data);
