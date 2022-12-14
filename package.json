@@ -1,5 +1,5 @@
 {
-  "name": "saleor-app-invoice-hub",
+  "name": "saleor-app-invoice",
   "version": "1.0.0",
   "private": true,
   "scripts": {
