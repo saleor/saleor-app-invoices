@@ -1,8 +1,14 @@
 import { InvoiceUploader } from "./invoice-uploader";
 import { Client, gql } from "urql";
 import { readFile } from "fs/promises";
-import { Blob } from "buffer";
 import { FileUploadMutation } from "../../../generated/graphql";
+/**
+ * Polyfill file because Node doesnt have it yet
+ * https://github.com/nodejs/node/commit/916af4ef2d63fe936a369bcf87ee4f69ec7c67ce
+ *
+ * Use File instead of Blob so Saleor can understand name
+ */
+import { File } from "@web-std/file";
 
 const fileUpload = gql`
   mutation FileUpload($file: Upload!) {
@@ -20,13 +26,9 @@ const fileUpload = gql`
 export class SaleorInvoiceUploader implements InvoiceUploader {
   constructor(private client: Client) {}
 
-  upload(filePath: string): Promise<string> {
+  upload(filePath: string, asName: string): Promise<string> {
     return readFile(filePath).then((file) => {
-      /**
-       * Should be File to infer file name in the API, however its not part of Node.js yet
-       * https://github.com/nodejs/node/commit/916af4ef2d63fe936a369bcf87ee4f69ec7c67ce
-       */
-      const blob = new Blob([file], { type: "application/pdf" });
+      const blob = new File([file], asName, { type: "application/pdf" });
 
       return this.client
         .mutation<FileUploadMutation>(fileUpload, {

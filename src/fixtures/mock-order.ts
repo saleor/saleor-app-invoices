@@ -32,8 +32,8 @@ export const mockOrder: OrderFragment = {
     streetAddress2: "Street 2",
     postalCode: "55-123",
     phone: "+48690563008",
-    firstName: "john",
-    lastName: "doe",
+    firstName: "MAdzia",
+    lastName: "Markusik",
     city: "WRO",
   },
   created: "2022-12-02T15:05:56.637068+00:00",
@@ -54,4 +54,46 @@ export const mockOrder: OrderFragment = {
       currency: "USD",
     },
   },
+  lines: [
+    {
+      productName: "Tales of pirate kittycat",
+      variantName: "Signed: Yes / vinyl",
+      quantity: 2,
+      totalPrice: {
+        currency: "USD",
+        gross: {
+          amount: 200,
+          currency: "USD",
+        },
+        net: {
+          amount: 200,
+          currency: "USD",
+        },
+        tax: {
+          amount: 0,
+          currency: "USD",
+        },
+      },
+    },
+    {
+      productName: "White Hoodie",
+      variantName: "10404946",
+      quantity: 1,
+      totalPrice: {
+        currency: "USD",
+        gross: {
+          amount: 6.15,
+          currency: "USD",
+        },
+        net: {
+          amount: 5,
+          currency: "USD",
+        },
+        tax: {
+          amount: 1.15,
+          currency: "USD",
+        },
+      },
+    },
+  ],
 };

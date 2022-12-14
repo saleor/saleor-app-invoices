@@ -1,9 +1,9 @@
 import { InvoiceGenerator } from "../invoice-generator";
-import { Order } from "../../../../generated/graphql";
+import { Order, OrderFragment } from "../../../../generated/graphql";
 const Microinvoice = require("microinvoice");
 
 export class MicroinvoiceInvoiceGenerator implements InvoiceGenerator {
-  async generate(order: Order, filename = "invoice.pdf"): Promise<void> {
+  async generate(order: OrderFragment, filename = "invoice.pdf"): Promise<void> {
     const microinvoiceInstance = new Microinvoice({
       style: {
         // header: {
@@ -25,18 +25,18 @@ export class MicroinvoiceInvoiceGenerator implements InvoiceGenerator {
             },
             {
               label: "Status",
-              value: order.status, // todo ?
+              value: "todo", // todo ?
             },
             {
               label: "Date",
               value: Intl.DateTimeFormat("pl-PL", {
                 dateStyle: "medium",
-                timeStyle: 'medium'
+                timeStyle: "medium",
               }).format(new Date(order.created)),
             },
           ],
 
-          currency: order.channel.currencyCode,
+          currency: "todo",
 
           customer: [
             {

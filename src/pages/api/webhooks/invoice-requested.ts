@@ -10,6 +10,10 @@ import {
   InvoiceNumberGenerator,
 } from "../../../modules/invoice-number-generator/invoice-number-generator";
 import { mockOrder } from "../../../fixtures/mock-order";
+import { MicroinvoiceInvoiceGenerator } from "../../../modules/invoice-generator/microinvoice/microinvoice-invoice-generator";
+import { randomUUID } from "crypto";
+import { hashInvoiceFilename } from "../../../modules/invoice-file-name/hash-invoice-filename";
+import { resolveTempPdfFileLocation } from "../../../modules/invoice-file-name/resolve-temp-pdf-file-location";
 
 export const InvoiceCreatedPayloadFragment = gql`
   fragment InvoiceRequestedPayload on InvoiceRequested {
@@ -47,7 +51,7 @@ export const handler: NextWebhookApiHandler<InvoiceRequestedPayloadFragment> = a
   const { event, authData, payload } = context;
 
   /**
-   *
+   * todo change to log/debug lib
    */
   console.debug("Webhook start");
 
@@ -65,7 +69,19 @@ export const handler: NextWebhookApiHandler<InvoiceRequestedPayloadFragment> = a
     });
   }
 
-  // todo generate invoice
+  const hashedInvoiceName = hashInvoiceFilename(invoiceName, orderId);
+  const hashedInvoiceFileName = `${hashedInvoiceName}.pdf`;
+  const tempPdfLocation = resolveTempPdfFileLocation(hashedInvoiceFileName);
+
+  await new MicroinvoiceInvoiceGenerator().generate(order, tempPdfLocation).catch((err) => {
+    console.error("Error generating invoice");
+    console.error(err);
+
+    return res.status(500).json({
+      error: "Error generating invoice",
+    });
+  });
+
   try {
     const client = createClient(`https://${authData.domain}/graphql/`, async () =>
       Promise.resolve({ token: authData.token })
@@ -73,7 +89,7 @@ export const handler: NextWebhookApiHandler<InvoiceRequestedPayloadFragment> = a
 
     const uploader = new SaleorInvoiceUploader(client);
 
-    const uploadedFileUrl = await uploader.upload("sample.pdf"); // todo use real generated file
+    const uploadedFileUrl = await uploader.upload(tempPdfLocation, `${invoiceName}.pdf`);
 
     console.debug("Uploaded file url: ", uploadedFileUrl);
     console.debug("Generated invoice name:", invoiceName);

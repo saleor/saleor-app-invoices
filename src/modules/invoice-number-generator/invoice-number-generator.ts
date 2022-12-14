@@ -13,7 +13,7 @@ export const InvoiceNumberGenerationStrategy = {
 } satisfies Record<string, (...args: any[]) => IInvoiceNumberGenerationStrategy>
 
 export class InvoiceNumberGenerator {
-    generateFromOrder(order: OrderFragment, strategy: InvoiceNumberGenerationStrategy): string {
+    generateFromOrder(order: OrderFragment, strategy: IInvoiceNumberGenerationStrategy): string {
         return strategy(order)
     }
 }

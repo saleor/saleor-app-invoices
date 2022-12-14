@@ -1,3 +1,3 @@
 export interface InvoiceUploader {
-  upload(filePath: string): Promise<string>;
+  upload(filePath: string, asName: string): Promise<string>;
 }

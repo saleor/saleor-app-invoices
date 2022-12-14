@@ -51,4 +51,19 @@ fragment Order on Order {
   total {
     ...TaxedMoney
   }
+  lines{
+    productName,
+    variantName,
+    quantity
+    totalPrice{
+      ...TaxedMoney
+    }
+  }
+}
+
+
+query O {
+  order(id:"T3JkZXI6OTFiZjM5ZDQtZjRiMC00M2QyLTgwMjEtZjVkMTMwNDVlMjkx") {
+    ...Order
+  }
 }
