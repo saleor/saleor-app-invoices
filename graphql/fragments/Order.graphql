@@ -1,0 +1,54 @@
+fragment Address on Address {
+  id
+  country {
+    country
+    code
+  }
+  companyName
+  cityArea
+  countryArea
+  streetAddress1
+  streetAddress2
+  postalCode
+  phone
+  firstName
+  lastName
+  city
+}
+
+fragment Money on Money {
+  amount
+  currency
+}
+
+fragment TaxedMoney on TaxedMoney {
+  currency
+  gross {
+    ...Money
+  }
+  net {
+    ...Money
+  }
+  tax {
+    ...Money
+  }
+}
+
+# TODO add more/rest
+fragment Order on Order {
+  id
+  billingAddress {
+    ...Address
+  }
+  shippingAddress {
+    ...Address
+  }
+  created
+  fulfillments {
+    created
+  }
+  number
+  total {
+    ...TaxedMoney
+  }
+}

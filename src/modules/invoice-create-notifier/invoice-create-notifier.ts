@@ -1,5 +1,5 @@
 import { Client, gql } from "urql";
-import { InvoiceCreateMutation, InvoiceCreateMutationVariables } from "../../../generated/graphql";
+import { InvoiceCreateMutationVariables, InvoiceCreateMutation } from "../../../generated/graphql";
 
 const InvoiceCreateMutation = gql`
   mutation InvoiceCreate($orderId: ID!, $invoiceInput: InvoiceCreateInput!) {
@@ -18,19 +18,25 @@ export class InvoiceCreateNotifier {
   constructor(private client: Client) {}
 
   notifyInvoiceCreated(orderId: string, invoiceNumber: string, invoiceUrl: string) {
-    return this.client
-      .mutation<InvoiceCreateMutation, InvoiceCreateMutationVariables>(InvoiceCreateMutation, {
-        orderId,
-        invoiceInput: {
-          url: invoiceUrl,
-          number: invoiceNumber,
-        },
-      })
-      .toPromise()
-      .then((result) => {
-        if (result.error) {
-          throw new Error(result.error.message);
-        }
-      });
+    return (
+      this.client
+        .mutation<InvoiceCreateMutation, InvoiceCreateMutationVariables>(InvoiceCreateMutation, {
+          orderId,
+          invoiceInput: {
+            url: invoiceUrl,
+            number: invoiceNumber,
+          },
+        })
+        .toPromise()
+        // todo fix types
+        .then((result) => {
+          console.log("invoiceCreate result");
+          console.log(result.data);
+
+          if (result.error) {
+            throw new Error(result.error.message);
+          }
+        })
+    );
   }
 }
