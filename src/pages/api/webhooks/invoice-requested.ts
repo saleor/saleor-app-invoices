@@ -13,7 +13,6 @@ import { mockOrder } from "../../../fixtures/mock-order";
 import { MicroinvoiceInvoiceGenerator } from "../../../modules/invoice-generator/microinvoice/microinvoice-invoice-generator";
 import { hashInvoiceFilename } from "../../../modules/invoice-file-name/hash-invoice-filename";
 import { resolveTempPdfFileLocation } from "../../../modules/invoice-file-name/resolve-temp-pdf-file-location";
-import { PuppeteerInvoiceGenerator } from "../../../modules/invoice-generator/puppeteer/puppeteer-invoice-generator";
 
 export const InvoiceCreatedPayloadFragment = gql`
   fragment InvoiceRequestedPayload on InvoiceRequested {
@@ -75,7 +74,7 @@ export const handler: NextWebhookApiHandler<InvoiceRequestedPayloadFragment> = a
     const hashedInvoiceFileName = `${hashedInvoiceName}.pdf`;
     const tempPdfLocation = resolveTempPdfFileLocation(hashedInvoiceFileName);
 
-    await new PuppeteerInvoiceGenerator().generate(order, tempPdfLocation).catch((err) => {
+    await new MicroinvoiceInvoiceGenerator().generate(order, tempPdfLocation).catch((err) => {
       console.error("Error generating invoice");
       console.error(err);
 
