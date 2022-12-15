@@ -11,9 +11,9 @@ import {
 } from "../../../modules/invoice-number-generator/invoice-number-generator";
 import { mockOrder } from "../../../fixtures/mock-order";
 import { MicroinvoiceInvoiceGenerator } from "../../../modules/invoice-generator/microinvoice/microinvoice-invoice-generator";
-import { randomUUID } from "crypto";
 import { hashInvoiceFilename } from "../../../modules/invoice-file-name/hash-invoice-filename";
 import { resolveTempPdfFileLocation } from "../../../modules/invoice-file-name/resolve-temp-pdf-file-location";
+import { PuppeteerInvoiceGenerator } from "../../../modules/invoice-generator/puppeteer/puppeteer-invoice-generator";
 
 export const InvoiceCreatedPayloadFragment = gql`
   fragment InvoiceRequestedPayload on InvoiceRequested {
@@ -54,6 +54,7 @@ export const handler: NextWebhookApiHandler<InvoiceRequestedPayloadFragment> = a
    * todo change to log/debug lib
    */
   console.debug("Webhook start");
+  console.time();
 
   const order = mockOrder; // todo get from payload when fixed
 
@@ -74,7 +75,7 @@ export const handler: NextWebhookApiHandler<InvoiceRequestedPayloadFragment> = a
     const hashedInvoiceFileName = `${hashedInvoiceName}.pdf`;
     const tempPdfLocation = resolveTempPdfFileLocation(hashedInvoiceFileName);
 
-    await new MicroinvoiceInvoiceGenerator().generate(order, tempPdfLocation).catch((err) => {
+    await new PuppeteerInvoiceGenerator().generate(order, tempPdfLocation).catch((err) => {
       console.error("Error generating invoice");
       console.error(err);
 
@@ -108,6 +109,7 @@ export const handler: NextWebhookApiHandler<InvoiceRequestedPayloadFragment> = a
   }
 
   console.debug("Success");
+  console.timeEnd();
 
   res.status(200).end();
 };

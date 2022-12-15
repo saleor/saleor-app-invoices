@@ -1,5 +1,5 @@
-import {Order} from "../../../generated/graphql";
+import { OrderFragment } from "../../../generated/graphql";
 
 export interface InvoiceGenerator {
-    generate(order: Order): Promise<void>
+  generate(order: OrderFragment, filename: string): Promise<void>;
 }
