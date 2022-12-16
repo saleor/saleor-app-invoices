@@ -1,8 +1,6 @@
 import { NextPage } from "next";
 import { useAppBridge } from "@saleor/app-sdk/app-bridge";
-import { useEffect } from "react";
-import { useIsMounted } from "usehooks-ts";
-import { useRouter } from "next/router";
+import React from "react";
 
 const ConfigurationPage: NextPage = () => {
   const { appBridgeState } = useAppBridge();
