@@ -3,7 +3,16 @@ import { Order, OrderFragment } from "../../../../generated/graphql";
 const Microinvoice = require("microinvoice");
 
 export class MicroinvoiceInvoiceGenerator implements InvoiceGenerator {
-  async generate(order: OrderFragment, filename = "invoice.pdf"): Promise<void> {
+  constructor(
+    private settings = {
+      locale: "en-US",
+    }
+  ) {}
+  async generate(
+    order: OrderFragment,
+    invoiceNumber: string,
+    filename = "invoice.pdf"
+  ): Promise<void> {
     const microinvoiceInstance = new Microinvoice({
       style: {
         // header: {
@@ -16,31 +25,27 @@ export class MicroinvoiceInvoiceGenerator implements InvoiceGenerator {
       },
       data: {
         invoice: {
-          name: "Invoice",
+          name: `Invoice ${invoiceNumber}`,
 
           header: [
             {
-              label: "Invoice Number",
+              label: "Order number",
               value: order.number,
             },
             {
-              label: "Status",
-              value: "todo", // todo ?
-            },
-            {
               label: "Date",
-              value: Intl.DateTimeFormat("pl-PL", {
+              value: Intl.DateTimeFormat(this.settings.locale, {
                 dateStyle: "medium",
                 timeStyle: "medium",
               }).format(new Date(order.created)),
             },
           ],
 
-          currency: "todo",
+          currency: order.total.currency,
 
           customer: [
             {
-              label: "Bill To",
+              label: "Customer",
               value: [
                 `${order.billingAddress?.firstName} ${order.billingAddress?.lastName}`,
                 order.billingAddress?.companyName,
@@ -51,19 +56,15 @@ export class MicroinvoiceInvoiceGenerator implements InvoiceGenerator {
                 order.billingAddress?.country.country,
               ],
             },
-            {
-              label: "Tax Identifier",
-              value: "todo",
-            },
-            {
-              label: "Information",
-              value: "todo",
-            },
+            // {
+            //   label: "Tax Identifier",
+            //   value: "todo",
+            // },
           ],
 
           seller: [
             {
-              label: "Bill From",
+              label: "Seller",
               value: ["todo"],
             },
             {

@@ -36,34 +36,32 @@ fragment TaxedMoney on TaxedMoney {
 
 # TODO add more/rest
 fragment Order on Order {
+
+  shippingPrice{
+    ...TaxedMoney
+  }
+  shippingMethodName
+  number
+
   id
   billingAddress {
-    ...Address
-  }
-  shippingAddress {
     ...Address
   }
   created
   fulfillments {
     created
   }
+  status
   number
   total {
     ...TaxedMoney
   }
-  lines{
-    productName,
-    variantName,
+  lines {
+    productName
+    variantName
     quantity
-    totalPrice{
+    totalPrice {
       ...TaxedMoney
     }
-  }
-}
-
-
-query O {
-  order(id:"T3JkZXI6OTFiZjM5ZDQtZjRiMC00M2QyLTgwMjEtZjVkMTMwNDVlMjkx") {
-    ...Order
   }
 }
