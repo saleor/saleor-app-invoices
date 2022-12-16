@@ -10,6 +10,7 @@ import { AppProps } from "next/app";
 import GraphQLProvider from "../providers/GraphQLProvider";
 import { ThemeSynchronizer } from "../lib/theme-synchronizer";
 import { NoSSRWrapper } from "../lib/no-ssr-wrapper";
+import { trpcClient } from "../modules/trpc/trpc-client";
 
 const themeOverrides: Partial<Theme> = {
   /**
@@ -56,4 +57,4 @@ function NextApp({ Component, pageProps }: AppProps) {
   );
 }
 
-export default NextApp;
+export default trpcClient.withTRPC(NextApp);
