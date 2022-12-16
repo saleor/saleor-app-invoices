@@ -1,5 +1,5 @@
 import { AppConfig } from "./app-config";
-import { MetadataManager } from "@saleor/app-sdk/settings-manager";
+import { MetadataManager, SettingsManager } from "@saleor/app-sdk/settings-manager";
 
 export interface AppConfigurator {
   setConfig(config: AppConfig): Promise<void>;
@@ -9,7 +9,7 @@ export interface AppConfigurator {
 export class PrivateMetadataAppConfigurator implements AppConfigurator {
   private metadataKey = "app-config";
 
-  constructor(private metadataManager: MetadataManager, private domain: string) {}
+  constructor(private metadataManager: SettingsManager, private domain: string) {}
 
   getConfig(): Promise<AppConfig | undefined> {
     return this.metadataManager.get(this.metadataKey).then((data) => {
