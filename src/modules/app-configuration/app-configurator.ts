@@ -12,7 +12,7 @@ export class PrivateMetadataAppConfigurator implements AppConfigurator {
   constructor(private metadataManager: SettingsManager, private domain: string) {}
 
   getConfig(): Promise<AppConfig | undefined> {
-    return this.metadataManager.get(this.metadataKey).then((data) => {
+    return this.metadataManager.get(this.metadataKey, this.domain).then((data) => {
       if (!data) {
         return data;
       }
