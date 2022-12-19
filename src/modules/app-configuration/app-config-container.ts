@@ -13,7 +13,7 @@ const getDefaultEmptyAddress = (): SellerShopConfig["address"] => ({
   streetAddress2: "",
 });
 
-const getChannelAddress = (appConfig: AppConfig | null) => (channelSlug: string) => {
+const getChannelAddress = (appConfig: AppConfig | null | undefined) => (channelSlug: string) => {
   try {
     return appConfig?.shopConfigPerChannel[channelSlug].address ?? null;
   } catch (e) {
@@ -22,7 +22,7 @@ const getChannelAddress = (appConfig: AppConfig | null) => (channelSlug: string)
 };
 
 const setChannelAddress =
-  (appConfig: AppConfig | null) =>
+  (appConfig: AppConfig | null | undefined) =>
   (channelSlug: string) =>
   (address: SellerShopConfig["address"]) => {
     const appConfigNormalized = structuredClone(appConfig) ?? { shopConfigPerChannel: {} };
@@ -34,6 +34,6 @@ const setChannelAddress =
   };
 
 export const AppConfigContainer = {
-    getChannelAddress,
-    setChannelAddress
-}
+  getChannelAddress,
+  setChannelAddress,
+};
