@@ -1,5 +1,6 @@
 import { InvoiceGenerator } from "../invoice-generator";
 import { Order, OrderFragment } from "../../../../generated/graphql";
+import { SellerShopConfig } from "../../app-configuration/app-config";
 const Microinvoice = require("microinvoice");
 
 export class MicroinvoiceInvoiceGenerator implements InvoiceGenerator {
@@ -8,11 +9,14 @@ export class MicroinvoiceInvoiceGenerator implements InvoiceGenerator {
       locale: "en-US",
     }
   ) {}
-  async generate(
-    order: OrderFragment,
-    invoiceNumber: string,
-    filename = "invoice.pdf"
-  ): Promise<void> {
+  async generate(input: {
+    order: OrderFragment;
+    invoiceNumber: string;
+    filename: string;
+    companyAddressData: SellerShopConfig["address"];
+  }): Promise<void> {
+    const { invoiceNumber, order, companyAddressData, filename } = input;
+
     const microinvoiceInstance = new Microinvoice({
       style: {
         // header: {
@@ -65,7 +69,16 @@ export class MicroinvoiceInvoiceGenerator implements InvoiceGenerator {
           seller: [
             {
               label: "Seller",
-              value: ["todo"],
+              value: [
+                `${companyAddressData.firstName} ${companyAddressData.lastName}`,
+                companyAddressData.companyName,
+                companyAddressData.streetAddress1,
+                companyAddressData.streetAddress2,
+                `${companyAddressData.postalCode} ${companyAddressData.city}`,
+                companyAddressData.cityArea,
+                companyAddressData.country,
+                companyAddressData.countryArea,
+              ],
             },
             {
               label: "Tax Identifier",

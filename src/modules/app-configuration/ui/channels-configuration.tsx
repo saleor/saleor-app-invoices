@@ -20,6 +20,8 @@ const useStyles = makeStyles((theme) => {
     listItem: {
       cursor: "pointer",
       height: "auto !important",
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr",
     },
     listItemActive: {
       border: `2px solid ${theme.palette.primary.main}`,
@@ -28,6 +30,9 @@ const useStyles = makeStyles((theme) => {
     formContainer: {
       top: 0,
       position: "sticky",
+    },
+    cellSlug: {
+      textAlign: "right",
     },
   };
 });
@@ -80,8 +85,7 @@ export const ChannelsConfiguration = () => {
         Configure seller details visible on the invoice
       </Typography>
       <div className={styles.grid}>
-        <div>
-          <OffsettedList gridTemplate={["1fr"]}></OffsettedList>
+        <OffsettedList gridTemplate={["1fr", "1fr"]}>
           <OffsettedListBody>
             {channelsData.data.channels.map((c) => {
               return (
@@ -94,12 +98,15 @@ export const ChannelsConfiguration = () => {
                     setActiveChannelSlug(c.slug);
                   }}
                 >
-                  <OffsettedListItemCell>{c.slug}</OffsettedListItemCell>
+                  <OffsettedListItemCell>{c.name}</OffsettedListItemCell>
+                  <OffsettedListItemCell className={styles.cellSlug}>
+                    <Typography variant="caption">{c.slug}</Typography>
+                  </OffsettedListItemCell>
                 </OffsettedListItem>
               );
             })}
           </OffsettedListBody>
-        </div>
+        </OffsettedList>
 
         {activeChannel && (
           <Paper elevation={0} className={styles.formContainer}>

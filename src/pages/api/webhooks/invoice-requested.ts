@@ -13,6 +13,8 @@ import { mockOrder } from "../../../fixtures/mock-order";
 import { MicroinvoiceInvoiceGenerator } from "../../../modules/invoice-generator/microinvoice/microinvoice-invoice-generator";
 import { hashInvoiceFilename } from "../../../modules/invoice-file-name/hash-invoice-filename";
 import { resolveTempPdfFileLocation } from "../../../modules/invoice-file-name/resolve-temp-pdf-file-location";
+import { createSettingsManager } from "../../../modules/app-configuration/metadata-manager";
+import { PrivateMetadataAppConfigurator } from "../../../modules/app-configuration/app-configurator";
 
 export const InvoiceCreatedPayloadFragment = gql`
   fragment InvoiceRequestedPayload on InvoiceRequested {
@@ -70,12 +72,33 @@ export const handler: NextWebhookApiHandler<InvoiceRequestedPayloadFragment> = a
   }
 
   try {
+    const client = createClient(`https://${authData.domain}/graphql/`, async () =>
+      Promise.resolve({ token: authData.token })
+    );
+
     const hashedInvoiceName = hashInvoiceFilename(invoiceName, orderId);
     const hashedInvoiceFileName = `${hashedInvoiceName}.pdf`;
     const tempPdfLocation = resolveTempPdfFileLocation(hashedInvoiceFileName);
 
+    const settingsManager = createSettingsManager(client);
+    const appConfigManager = new PrivateMetadataAppConfigurator(settingsManager, authData.domain);
+    const config = await appConfigManager.getConfig();
+
+    console.log(config);
+
+    if (!config) {
+      // todo must fallback here to Shop
+
+      return res.status(500);
+    }
+
     await new MicroinvoiceInvoiceGenerator()
-      .generate(order, invoiceName, tempPdfLocation)
+      .generate({
+        order,
+        invoiceNumber: invoiceName,
+        filename: tempPdfLocation,
+        companyAddressData: config.shopConfigPerChannel[order.channel.slug]?.address,
+      })
       .catch((err) => {
         console.error("Error generating invoice");
         console.error(err);
@@ -84,10 +107,6 @@ export const handler: NextWebhookApiHandler<InvoiceRequestedPayloadFragment> = a
           error: "Error generating invoice",
         });
       });
-
-    const client = createClient(`https://${authData.domain}/graphql/`, async () =>
-      Promise.resolve({ token: authData.token })
-    );
 
     const uploader = new SaleorInvoiceUploader(client);
 

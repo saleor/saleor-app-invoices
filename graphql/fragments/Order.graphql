@@ -56,6 +56,9 @@ fragment Order on Order {
   total {
     ...TaxedMoney
   }
+  channel {
+    slug
+  }
   lines {
     productName
     variantName

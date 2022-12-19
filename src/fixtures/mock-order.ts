@@ -1,6 +1,9 @@
 import { OrderFragment, OrderStatus } from "../../generated/graphql";
 
 export const mockOrder: OrderFragment = {
+  channel: {
+    slug: "default-channel",
+  },
   shippingPrice: {
     currency: "USD",
     gross: {
