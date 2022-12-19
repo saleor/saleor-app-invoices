@@ -1,8 +1,7 @@
 import { trpcClient } from "../../trpc/trpc-client";
-import { LinearProgress, Paper, TextField, Typography } from "@material-ui/core";
+import { LinearProgress, Paper, Typography } from "@material-ui/core";
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  Button,
   makeStyles,
   OffsettedList,
   OffsettedListBody,
@@ -10,9 +9,6 @@ import {
   OffsettedListItemCell,
 } from "@saleor/macaw-ui";
 import clsx from "clsx";
-
-import { useForm } from "react-hook-form";
-import { SellerShopConfig } from "../app-config";
 import { AppConfigContainer } from "../app-config-container";
 import { AddressForm } from "./address-form";
 
@@ -105,19 +101,21 @@ export const ChannelsConfiguration = () => {
           </OffsettedListBody>
         </div>
 
-        {activeChannelSlug && (
+        {activeChannel && (
           <Paper elevation={0} className={styles.formContainer}>
             <AddressForm
+              channelID={activeChannel.id}
               key={activeChannelSlug}
-              channelSlug={activeChannelSlug}
+              channelSlug={activeChannel.slug}
               onSubmit={async (data) => {
-                const newConfig =
-                  AppConfigContainer.setChannelAddress(configurationData)(activeChannelSlug)(data);
+                const newConfig = AppConfigContainer.setChannelAddress(configurationData)(
+                  activeChannel.slug
+                )(data);
 
                 mutate(newConfig);
               }}
               initialData={AppConfigContainer.getChannelAddress(configurationData)(
-                activeChannelSlug
+                activeChannel.slug
               )}
               channelName={activeChannel?.name ?? activeChannelSlug}
             />

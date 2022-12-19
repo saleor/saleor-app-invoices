@@ -1,8 +1,9 @@
 import { SellerShopConfig } from "../app-config";
 import { useForm } from "react-hook-form";
-import { TextField, Typography } from "@material-ui/core";
+import { TextField, TextFieldProps, Typography } from "@material-ui/core";
 import { Button, makeStyles } from "@saleor/macaw-ui";
 import React from "react";
+import { actions, useAppBridge } from "@saleor/app-sdk/app-bridge";
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -12,12 +13,17 @@ const useStyles = makeStyles((theme) => {
     form: {
       padding: 20,
     },
+    channelName: {
+      fontFamily: "monospace",
+      cursor: "pointer",
+    },
   };
 });
 
 export const AddressForm = (props: {
   channelSlug: string;
   channelName: string;
+  channelID: string;
   onSubmit(data: SellerShopConfig["address"]): Promise<void>;
   initialData?: SellerShopConfig["address"] | null;
 }) => {
@@ -25,6 +31,12 @@ export const AddressForm = (props: {
     defaultValues: props.initialData ?? undefined,
   });
   const styles = useStyles();
+  const { appBridge } = useAppBridge();
+
+  const CommonFieldProps: TextFieldProps = {
+    className: styles.field,
+    fullWidth: true,
+  };
 
   return (
     <form
@@ -34,45 +46,33 @@ export const AddressForm = (props: {
       className={styles.form}
     >
       <Typography variant="body1" paragraph>
-        Configure {props.channelName} channel:
+        Configure
+        <strong
+          onClick={() => {
+            appBridge?.dispatch(
+              actions.Redirect({
+                to: `/channels/${props.channelID}`,
+              })
+            );
+          }}
+          className={styles.channelName}
+        >
+          {` ${props.channelName} `}
+        </strong>
+        channel:
       </Typography>
-      <TextField
-        className={styles.field}
-        label="Company Name"
-        fullWidth
-        {...register("companyName")}
-      />
-      <TextField className={styles.field} label="First Name" fullWidth {...register("firstName")} />
-      <TextField className={styles.field} label="Last Name" fullWidth {...register("lastName")} />
-      <TextField
-        className={styles.field}
-        label="Street Address 1"
-        fullWidth
-        {...register("streetAddress1")}
-      />
-      <TextField
-        className={styles.field}
-        label="Street Address 2"
-        fullWidth
-        {...register("streetAddress2")}
-      />
+      <TextField label="Company Name" {...CommonFieldProps} {...register("companyName")} />
+      <TextField {...CommonFieldProps} label="First Name" {...register("firstName")} />
+      <TextField {...CommonFieldProps} label="Last Name" {...register("lastName")} />
+      <TextField label="Street Address 1" {...CommonFieldProps} {...register("streetAddress1")} />
+      <TextField {...CommonFieldProps} label="Street Address 2" {...register("streetAddress2")} />
       <div style={{ display: "grid", gap: 20, gridTemplateColumns: "1fr 2fr" }}>
-        <TextField
-          className={styles.field}
-          label="Postal Code"
-          fullWidth
-          {...register("postalCode")}
-        />
-        <TextField className={styles.field} label="City" fullWidth {...register("city")} />
+        <TextField {...CommonFieldProps} label="Postal Code" {...register("postalCode")} />
+        <TextField {...CommonFieldProps} label="City" {...register("city")} />
       </div>
-      <TextField className={styles.field} label="City Area" fullWidth {...register("cityArea")} />
-      <TextField className={styles.field} label="Country" fullWidth {...register("country")} />
-      <TextField
-        className={styles.field}
-        label="Country Area"
-        fullWidth
-        {...register("countryArea")}
-      />
+      <TextField {...CommonFieldProps} label="City Area" {...register("cityArea")} />
+      <TextField {...CommonFieldProps} label="Country" {...register("country")} />
+      <TextField label="Country Area" {...CommonFieldProps} {...register("countryArea")} />
       <Button type="submit" fullWidth variant="primary">
         Save channel configuration
       </Button>
