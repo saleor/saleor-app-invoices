@@ -5,7 +5,7 @@ import { ChannelFragment, ShopInfoFragment } from "../../../generated/graphql";
 export const FallbackAppConfig = {
   createFallbackConfigFromExistingShopAndChannels(
     channels: ChannelFragment[],
-    shopAddress: ShopInfoFragment
+    shopAddress: ShopInfoFragment | null
   ) {
     return (channels ?? []).reduce<AppConfig>(
       (state, channel) => {

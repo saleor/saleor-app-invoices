@@ -1,14 +1,12 @@
-import { createClient } from "../../lib/graphql";
 import { router } from "../trpc/trpc-server";
 import { procedureWithGraphqlClient } from "../trpc/procedure-with-graphql-client";
 import { PrivateMetadataAppConfigurator } from "./app-configurator";
 import { createSettingsManager } from "./metadata-manager";
-import { z } from "zod";
 import { ChannelsFetcher } from "../channels/channels-fetcher";
-import { AppConfigContainer } from "./app-config-container";
-import { AppConfig } from "./app-config";
 import { ShopInfoFetcher } from "../shop-info/shop-info-fetcher";
 import { pinoLogger } from "../../lib/logger";
+import { FallbackAppConfig } from "./fallback-app-config";
+import { appConfigInputSchema } from "./app-config-input-schema";
 
 export const appConfigurationRouter = router({
   fetch: procedureWithGraphqlClient.query(async ({ ctx, input }) => {
@@ -16,86 +14,50 @@ export const appConfigurationRouter = router({
 
     logger.debug("appConfigurationRouter.fetch called");
 
-    const client = createClient(`https://${ctx.domain}/graphql/`, async () =>
-      Promise.resolve({ token: ctx.appToken })
-    );
-
     const appConfigurator = new PrivateMetadataAppConfigurator(
-      createSettingsManager(client),
+      createSettingsManager(ctx.apiClient),
       ctx.domain
     );
 
     const savedAppConfig = (await appConfigurator.getConfig()) ?? null;
 
-    logger.debug(savedAppConfig, "Retrieved app config from Metadata");
+    logger.debug(savedAppConfig, "Retrieved app config from Metadata. Will return it");
 
-    if (!savedAppConfig) {
-      logger.info("App config not found in metadata. Will create default config now.");
-
-      const channelsFetcher = new ChannelsFetcher(client);
-      const shopInfoFetcher = new ShopInfoFetcher(client);
-
-      const [channels, shopAddress] = await Promise.all([
-        channelsFetcher.fetchChannels(),
-        shopInfoFetcher.fetchShopInfo(),
-      ]);
-
-      logger.debug(channels, "Fetched channels");
-      logger.debug(shopAddress, "Fetched shop address");
-
-      const appConfig = (channels ?? []).reduce<AppConfig>(
-        (state, channel) => {
-          return AppConfigContainer.setChannelAddress(state)(channel.slug)({
-            city: shopAddress?.companyAddress?.city ?? "",
-            cityArea: shopAddress?.companyAddress?.cityArea ?? "",
-            companyName: shopAddress?.companyAddress?.companyName ?? "",
-            country: shopAddress?.companyAddress?.country.country ?? "",
-            countryArea: shopAddress?.companyAddress?.countryArea ?? "",
-            firstName: shopAddress?.companyAddress?.firstName ?? "",
-            lastName: shopAddress?.companyAddress?.lastName ?? "",
-            postalCode: shopAddress?.companyAddress?.postalCode ?? "",
-            streetAddress1: shopAddress?.companyAddress?.streetAddress1 ?? "",
-            streetAddress2: shopAddress?.companyAddress?.streetAddress2 ?? "",
-          });
-        },
-        { shopConfigPerChannel: {} }
-      );
-
-      await appConfigurator.setConfig(appConfig);
-
-      return appConfig;
+    if (savedAppConfig) {
+      return savedAppConfig;
     }
 
-    return savedAppConfig;
+    logger.info("App config not found in metadata. Will create default config now.");
+
+    const channelsFetcher = new ChannelsFetcher(ctx.apiClient);
+    const shopInfoFetcher = new ShopInfoFetcher(ctx.apiClient);
+
+    const [channels, shopAddress] = await Promise.all([
+      channelsFetcher.fetchChannels(),
+      shopInfoFetcher.fetchShopInfo(),
+    ]);
+
+    logger.debug(channels, "Fetched channels");
+    logger.debug(shopAddress, "Fetched shop address");
+
+    const appConfig = FallbackAppConfig.createFallbackConfigFromExistingShopAndChannels(
+      channels ?? [],
+      shopAddress
+    );
+
+    logger.debug(appConfig, "Created a fallback AppConfig. Will save it.");
+
+    await appConfigurator.setConfig(appConfig);
+
+    logger.info("Saved initial AppConfig");
+
+    return appConfig;
   }),
   setAndReplace: procedureWithGraphqlClient
-    .input(
-      z.object({
-        shopConfigPerChannel: z.record(
-          z.object({
-            address: z.object({
-              companyName: z.string().min(0),
-              cityArea: z.string().min(0),
-              countryArea: z.string().min(0),
-              streetAddress1: z.string().min(0),
-              streetAddress2: z.string().min(0),
-              postalCode: z.string().min(0),
-              firstName: z.string().min(0),
-              lastName: z.string().min(0),
-              city: z.string().min(0),
-              country: z.string().min(0),
-            }),
-          })
-        ),
-      })
-    )
+    .input(appConfigInputSchema)
     .mutation(async ({ ctx, input }) => {
-      const client = createClient(`https://${ctx.domain}/graphql/`, async () =>
-        Promise.resolve({ token: ctx.appToken })
-      );
-
       const appConfigurator = new PrivateMetadataAppConfigurator(
-        createSettingsManager(client),
+        createSettingsManager(ctx.apiClient),
         ctx.domain
       );
 
