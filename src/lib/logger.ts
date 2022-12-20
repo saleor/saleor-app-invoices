@@ -1,10 +1,10 @@
 import pino from "pino";
 
 /**
- * TODO Set up control via env, log drain etc
+ * TODO Set up log drain etc
  */
 export const logger = pino({
-  level: "debug",
+  level: process.env.DEBUG ?? "silent",
   transport: {
     target: "pino-pretty",
     options: {
