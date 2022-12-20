@@ -15,6 +15,7 @@ import { hashInvoiceFilename } from "../../../modules/invoice-file-name/hash-inv
 import { resolveTempPdfFileLocation } from "../../../modules/invoice-file-name/resolve-temp-pdf-file-location";
 import { createSettingsManager } from "../../../modules/app-configuration/metadata-manager";
 import { PrivateMetadataAppConfigurator } from "../../../modules/app-configuration/app-configurator";
+import { appConfigurationRouter } from "../../../modules/app-configuration/app-configuration.router";
 
 export const InvoiceCreatedPayloadFragment = gql`
   fragment InvoiceRequestedPayload on InvoiceRequested {
@@ -84,7 +85,16 @@ export const handler: NextWebhookApiHandler<InvoiceRequestedPayloadFragment> = a
     const appConfigManager = new PrivateMetadataAppConfigurator(settingsManager, authData.domain);
     const config = await appConfigManager.getConfig();
 
-    console.log(config);
+    try {
+      const caller = appConfigurationRouter.createCaller(authData);
+      const r = await caller.fetch();
+
+      console.log("caller response");
+      console.log(r);
+    } catch (e) {
+      console.error("error using caller");
+      console.error(e);
+    }
 
     if (!config) {
       // todo must fallback here to Shop

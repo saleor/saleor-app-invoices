@@ -1,4 +1,3 @@
-import { FetchChannelsDocument } from "../../../generated/graphql";
 import { createClient } from "../../lib/graphql";
 
 import { gql } from "urql";
@@ -24,6 +23,9 @@ gql`
 
 export const appConfigurationRouter = router({
   fetch: procedureWithGraphqlClient.query(async ({ ctx, input }) => {
+    console.log("ctx in fetch");
+    console.log(ctx);
+
     const client = createClient(`https://${ctx.domain}/graphql/`, async () =>
       Promise.resolve({ token: ctx.appToken })
     );
