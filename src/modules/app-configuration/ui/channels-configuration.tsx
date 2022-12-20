@@ -1,60 +1,32 @@
 import { trpcClient } from "../../trpc/trpc-client";
 import { LinearProgress, Paper, Typography } from "@material-ui/core";
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  makeStyles,
-  OffsettedList,
-  OffsettedListBody,
-  OffsettedListItem,
-  OffsettedListItemCell,
-} from "@saleor/macaw-ui";
-import clsx from "clsx";
+import { makeStyles } from "@saleor/macaw-ui";
 import { AppConfigContainer } from "../app-config-container";
 import { AddressForm } from "./address-form";
+import { ChannelsList } from "./channels-list";
 
 const useStyles = makeStyles((theme) => {
   return {
     header: { marginBottom: 20 },
     grid: { display: "grid", gridTemplateColumns: "1fr 2fr", alignItems: "start", gap: 40 },
-
-    listItem: {
-      cursor: "pointer",
-      height: "auto !important",
-      display: "grid",
-      gridTemplateColumns: "1fr 1fr",
-    },
-    listItemActive: {
-      border: `2px solid ${theme.palette.primary.main}`,
-    },
-
     formContainer: {
       top: 0,
       position: "sticky",
     },
-    cellSlug: {
-      textAlign: "right",
-    },
   };
 });
 
-/**
- * todo
- * - add form (rhf?) -> dynamic, per channel
- * - save to metadata
- * - fetch initial state from metadata
- * - fallback to Shop
- */
 export const ChannelsConfiguration = () => {
   const styles = useStyles();
 
   const { data: configurationData, refetch: refetchConfig } =
     trpcClient.appConfiguration.fetch.useQuery();
-  const {
-    data: channelsData,
-    isLoading,
-    isSuccess: isChannelsFetchSuccess,
-  } = trpcClient.channels.fetch.useQuery();
+
+  const channels = trpcClient.channels.fetch.useQuery();
+
   const [activeChannelSlug, setActiveChannelSlug] = useState<string | null>(null);
+
   const { mutate, error: saveError } = trpcClient.appConfiguration.setAndReplace.useMutation({
     onSuccess() {
       refetchConfig();
@@ -62,21 +34,25 @@ export const ChannelsConfiguration = () => {
   });
 
   useEffect(() => {
-    if (isChannelsFetchSuccess) {
-      setActiveChannelSlug(channelsData![0].slug ?? null);
+    if (channels.isSuccess) {
+      setActiveChannelSlug(channels.data![0].slug ?? null);
     }
-  }, [isChannelsFetchSuccess, channelsData]);
+  }, [channels.isSuccess, channels.data]);
 
   const activeChannel = useMemo(() => {
     try {
-      return channelsData!.find((c) => c.slug === activeChannelSlug)!;
+      return channels.data!.find((c) => c.slug === activeChannelSlug)!;
     } catch (e) {
       return null;
     }
-  }, [channelsData, activeChannelSlug]);
+  }, [channels.data, activeChannelSlug]);
 
-  if (isLoading || !channelsData) {
+  if (channels.isLoading || !channels.data) {
     return <LinearProgress />;
+  }
+
+  if (!activeChannel) {
+    return <div>Error. No channel available</div>;
   }
 
   return (
@@ -85,28 +61,11 @@ export const ChannelsConfiguration = () => {
         Configure seller details visible on the invoice
       </Typography>
       <div className={styles.grid}>
-        <OffsettedList gridTemplate={["1fr", "1fr"]}>
-          <OffsettedListBody>
-            {channelsData.map((c) => {
-              return (
-                <OffsettedListItem
-                  className={clsx(styles.listItem, {
-                    [styles.listItemActive]: c.slug === activeChannelSlug,
-                  })}
-                  key={c.slug}
-                  onClick={() => {
-                    setActiveChannelSlug(c.slug);
-                  }}
-                >
-                  <OffsettedListItemCell>{c.name}</OffsettedListItemCell>
-                  <OffsettedListItemCell className={styles.cellSlug}>
-                    <Typography variant="caption">{c.slug}</Typography>
-                  </OffsettedListItemCell>
-                </OffsettedListItem>
-              );
-            })}
-          </OffsettedListBody>
-        </OffsettedList>
+        <ChannelsList
+          channels={channels.data}
+          activeChannelSlug={activeChannel.slug}
+          onChannelClick={setActiveChannelSlug}
+        />
 
         {activeChannel && (
           <Paper elevation={0} className={styles.formContainer}>

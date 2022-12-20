@@ -5,28 +5,28 @@ import { Button, makeStyles } from "@saleor/macaw-ui";
 import React from "react";
 import { actions, useAppBridge } from "@saleor/app-sdk/app-bridge";
 
-const useStyles = makeStyles((theme) => {
-  return {
-    field: {
-      marginBottom: 20,
-    },
-    form: {
-      padding: 20,
-    },
-    channelName: {
-      fontFamily: "monospace",
-      cursor: "pointer",
-    },
-  };
+const useStyles = makeStyles({
+  field: {
+    marginBottom: 20,
+  },
+  form: {
+    padding: 20,
+  },
+  channelName: {
+    fontFamily: "monospace",
+    cursor: "pointer",
+  },
 });
 
-export const AddressForm = (props: {
+type Props = {
   channelSlug: string;
   channelName: string;
   channelID: string;
   onSubmit(data: SellerShopConfig["address"]): Promise<void>;
   initialData?: SellerShopConfig["address"] | null;
-}) => {
+};
+
+export const AddressForm = (props: Props) => {
   const { register, handleSubmit } = useForm<SellerShopConfig["address"]>({
     defaultValues: props.initialData ?? undefined,
   });
@@ -38,6 +38,14 @@ export const AddressForm = (props: {
     fullWidth: true,
   };
 
+  const handleChannelNameClick = () => {
+    appBridge?.dispatch(
+      actions.Redirect({
+        to: `/channels/${props.channelID}`,
+      })
+    );
+  };
+
   return (
     <form
       onSubmit={handleSubmit((data, event) => {
@@ -47,16 +55,7 @@ export const AddressForm = (props: {
     >
       <Typography variant="body1" paragraph>
         Configure
-        <strong
-          onClick={() => {
-            appBridge?.dispatch(
-              actions.Redirect({
-                to: `/channels/${props.channelID}`,
-              })
-            );
-          }}
-          className={styles.channelName}
-        >
+        <strong onClick={handleChannelNameClick} className={styles.channelName}>
           {` ${props.channelName} `}
         </strong>
         channel:

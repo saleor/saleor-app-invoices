@@ -1,27 +1,43 @@
 import { NextPage } from "next";
-import React from "react";
-import { PageTab, PageTabs } from "@saleor/macaw-ui";
+import React, { useEffect } from "react";
+import { AlertBase } from "@saleor/macaw-ui";
 import { ChannelsConfiguration } from "../modules/app-configuration/ui/channels-configuration";
-import { Divider } from "@material-ui/core";
+import { trpcClient } from "../modules/trpc/trpc-client";
+import { useRouter } from "next/router";
 
 type Tab = "channels";
 
+const alertStyle = {
+  marginBottom: 40,
+};
+
 const ConfigurationPage: NextPage = () => {
   const [activeTab, setActiveTab] = React.useState<Tab>("channels");
+  const channels = trpcClient.channels.fetch.useQuery();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (channels.isSuccess && channels.data.length === 0) {
+      router.push("/not-ready");
+    }
+  }, [channels.data, channels.isSuccess]);
 
   return (
     <div>
       <h1>Saleor Invoices App</h1>
-      <p>Generate invoices for Orders in your shop</p>
+      <AlertBase style={alertStyle} variant="info">
+        Generate invoices for Orders in your shop
+      </AlertBase>
 
-      <PageTabs
-        style={{ marginBottom: 20 }}
-        value={activeTab}
-        onChange={(e) => setActiveTab(e as Tab)}
-      >
-        <PageTab value="channels" label="Channels configuration" />
-      </PageTabs>
-      <Divider style={{ marginBottom: 20 }} />
+      {/* Enable if more config available */}
+      {/*<PageTabs*/}
+      {/*  style={{ marginBottom: 20 }}*/}
+      {/*  value={activeTab}*/}
+      {/*  onChange={(e) => setActiveTab(e as Tab)}*/}
+      {/*>*/}
+      {/*  <PageTab value="channels" label="Channels configuration" />*/}
+      {/*</PageTabs>*/}
+      {/*<Divider style={{ marginBottom: 20 }} />*/}
 
       {activeTab === "channels" && <ChannelsConfiguration />}
     </div>
