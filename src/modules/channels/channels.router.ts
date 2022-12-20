@@ -1,7 +1,4 @@
-import { FetchChannelsDocument } from "../../../generated/graphql";
 import { createClient } from "../../lib/graphql";
-
-import { gql } from "urql";
 import { router } from "../trpc/trpc-server";
 import { procedureWithGraphqlClient } from "../trpc/procedure-with-graphql-client";
 import { ChannelsFetcher } from "./channels-fetcher";
