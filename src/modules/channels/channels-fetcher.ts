@@ -2,11 +2,15 @@ import { Client, gql } from "urql";
 import { FetchChannelsDocument } from "../../../generated/graphql";
 
 gql`
+  fragment Channel on Channel {
+    name
+    id
+    slug
+  }
+
   query FetchChannels {
     channels {
-      name
-      id
-      slug
+      ...Channel
     }
   }
 `;

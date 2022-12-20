@@ -1,6 +1,4 @@
 import { createClient } from "../../lib/graphql";
-
-import { gql } from "urql";
 import { router } from "../trpc/trpc-server";
 import { procedureWithGraphqlClient } from "../trpc/procedure-with-graphql-client";
 import { PrivateMetadataAppConfigurator } from "./app-configurator";
@@ -10,21 +8,13 @@ import { ChannelsFetcher } from "../channels/channels-fetcher";
 import { AppConfigContainer } from "./app-config-container";
 import { AppConfig } from "./app-config";
 import { ShopInfoFetcher } from "../shop-info/shop-info-fetcher";
-
-gql`
-  query FetchChannels {
-    channels {
-      name
-      id
-      slug
-    }
-  }
-`;
+import { pinoLogger } from "../../lib/logger";
 
 export const appConfigurationRouter = router({
   fetch: procedureWithGraphqlClient.query(async ({ ctx, input }) => {
-    console.log("ctx in fetch");
-    console.log(ctx);
+    const logger = pinoLogger.child({ domain: ctx.domain });
+
+    logger.debug("appConfigurationRouter.fetch called");
 
     const client = createClient(`https://${ctx.domain}/graphql/`, async () =>
       Promise.resolve({ token: ctx.appToken })
@@ -37,14 +27,23 @@ export const appConfigurationRouter = router({
 
     const savedAppConfig = (await appConfigurator.getConfig()) ?? null;
 
+    logger.debug(savedAppConfig, "Retrieved app config from Metadata");
+
     if (!savedAppConfig) {
+      logger.info("App config not found in metadata. Will create default config now.");
+
       const channelsFetcher = new ChannelsFetcher(client);
       const shopInfoFetcher = new ShopInfoFetcher(client);
 
-      const channels = (await channelsFetcher.fetchChannels()) ?? [];
-      const shopAddress = await shopInfoFetcher.fetchShopInfo();
+      const [channels, shopAddress] = await Promise.all([
+        channelsFetcher.fetchChannels(),
+        shopInfoFetcher.fetchShopInfo(),
+      ]);
 
-      const appConfig = channels.reduce<AppConfig>(
+      logger.debug(channels, "Fetched channels");
+      logger.debug(shopAddress, "Fetched shop address");
+
+      const appConfig = (channels ?? []).reduce<AppConfig>(
         (state, channel) => {
           return AppConfigContainer.setChannelAddress(state)(channel.slug)({
             city: shopAddress?.companyAddress?.city ?? "",
