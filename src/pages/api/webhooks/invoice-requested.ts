@@ -13,9 +13,8 @@ import { mockOrder } from "../../../fixtures/mock-order";
 import { MicroinvoiceInvoiceGenerator } from "../../../modules/invoice-generator/microinvoice/microinvoice-invoice-generator";
 import { hashInvoiceFilename } from "../../../modules/invoice-file-name/hash-invoice-filename";
 import { resolveTempPdfFileLocation } from "../../../modules/invoice-file-name/resolve-temp-pdf-file-location";
-import { createSettingsManager } from "../../../modules/app-configuration/metadata-manager";
-import { PrivateMetadataAppConfigurator } from "../../../modules/app-configuration/app-configurator";
 import { appConfigurationRouter } from "../../../modules/app-configuration/app-configuration.router";
+import { createLogger } from "../../../lib/logger";
 
 export const InvoiceCreatedPayloadFragment = gql`
   fragment InvoiceRequestedPayload on InvoiceRequested {
@@ -50,23 +49,26 @@ export const handler: NextWebhookApiHandler<InvoiceRequestedPayloadFragment> = a
   res,
   context
 ) => {
-  const { event, authData, payload } = context;
+  const { authData, payload, baseUrl } = context;
 
-  /**
-   * todo change to log/debug lib
-   */
-  console.debug("Webhook start");
-  console.time();
+  const logger = createLogger({ domain: authData.domain, url: baseUrl });
 
   const order = mockOrder; // todo get from payload when fixed
+
+  logger.info({ orderId: order.id }, "Received event INVOICE_REQUESTED");
+  logger.debug(order);
 
   const orderId = mockOrder.id;
   const invoiceName = invoiceNumberGenerator.generateFromOrder(
     order as OrderFragment,
-    InvoiceNumberGenerationStrategy.localizedDate("us-US")
+    InvoiceNumberGenerationStrategy.localizedDate("en-US") // todo connect locale -> where from?
   );
 
+  logger.debug({ invoiceName }, "Generated invoice name");
+
   if (!authData) {
+    logger.error("Auth data not found");
+
     return res.status(403).json({
       error: `Could not find auth data. Check if app is installed.`,
     });
@@ -78,40 +80,24 @@ export const handler: NextWebhookApiHandler<InvoiceRequestedPayloadFragment> = a
     );
 
     const hashedInvoiceName = hashInvoiceFilename(invoiceName, orderId);
+    logger.debug({ hashedInvoiceName });
+
     const hashedInvoiceFileName = `${hashedInvoiceName}.pdf`;
     const tempPdfLocation = resolveTempPdfFileLocation(hashedInvoiceFileName);
+    logger.debug({ tempPdfLocation });
 
-    const settingsManager = createSettingsManager(client);
-    const appConfigManager = new PrivateMetadataAppConfigurator(settingsManager, authData.domain);
-    const config = await appConfigManager.getConfig();
-
-    try {
-      const caller = appConfigurationRouter.createCaller(authData);
-      const r = await caller.fetch();
-
-      console.log("caller response");
-      console.log(r);
-    } catch (e) {
-      console.error("error using caller");
-      console.error(e);
-    }
-
-    if (!config) {
-      // todo must fallback here to Shop
-
-      return res.status(500);
-    }
+    const configurationCaller = appConfigurationRouter.createCaller(authData);
+    const appConfig = await configurationCaller.fetch();
 
     await new MicroinvoiceInvoiceGenerator()
       .generate({
         order,
         invoiceNumber: invoiceName,
         filename: tempPdfLocation,
-        companyAddressData: config.shopConfigPerChannel[order.channel.slug]?.address,
+        companyAddressData: appConfig.shopConfigPerChannel[order.channel.slug]?.address,
       })
       .catch((err) => {
-        console.error("Error generating invoice");
-        console.error(err);
+        logger.error(err, "Error generating invoice");
 
         return res.status(500).json({
           error: "Error generating invoice",
@@ -121,9 +107,7 @@ export const handler: NextWebhookApiHandler<InvoiceRequestedPayloadFragment> = a
     const uploader = new SaleorInvoiceUploader(client);
 
     const uploadedFileUrl = await uploader.upload(tempPdfLocation, `${invoiceName}.pdf`);
-
-    console.debug("Uploaded file url: ", uploadedFileUrl);
-    console.debug("Generated invoice name:", invoiceName);
+    logger.info({ uploadedFileUrl }, "Uploaded file to storage, will notify Saleor now");
 
     await new InvoiceCreateNotifier(client).notifyInvoiceCreated(
       orderId,
@@ -131,17 +115,16 @@ export const handler: NextWebhookApiHandler<InvoiceRequestedPayloadFragment> = a
       uploadedFileUrl
     );
   } catch (e) {
-    console.error(e);
+    logger.error(e);
 
     return res.status(500).json({
       error: (e as any)?.message ?? "Error",
     });
   }
 
-  console.debug("Success");
-  console.timeEnd();
+  logger.info("Success");
 
-  res.status(200).end();
+  return res.status(200).end();
 };
 
 export default invoiceRequestedWebhook.createHandler(handler);

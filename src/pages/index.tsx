@@ -17,7 +17,7 @@ const IndexPage: NextPage = () => {
 
   return (
     <div>
-      <h1>Saleor Invoices Hub</h1>
+      <h1>Saleor Invoices</h1>
       <p>This is Saleor App that allows invoices generation</p>
       <p>Install app in your Saleor instance and open in with Dashboard</p>
     </div>

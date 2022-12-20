@@ -1,7 +1,8 @@
 import { Client, gql } from "urql";
-import { InvoiceCreate, InvoiceCreateInput } from "../../../generated/graphql";
+import { InvoiceCreateDocument } from "../../../generated/graphql";
+import { logger } from "../../lib/logger";
 
-const InvoiceCreateMutation = gql`
+gql`
   mutation InvoiceCreate($orderId: ID!, $invoiceInput: InvoiceCreateInput!) {
     invoiceCreate(input: $invoiceInput, orderId: $orderId) {
       errors {
@@ -18,28 +19,26 @@ export class InvoiceCreateNotifier {
   constructor(private client: Client) {}
 
   notifyInvoiceCreated(orderId: string, invoiceNumber: string, invoiceUrl: string) {
-    return (
-      this.client
-        // TODO Why these generated types are missing
-        .mutation<InvoiceCreate, { orderId: string; invoiceInput: InvoiceCreateInput }>(
-          InvoiceCreateMutation,
-          {
-            orderId,
-            invoiceInput: {
-              url: invoiceUrl,
-              number: invoiceNumber,
-            },
-          }
-        )
-        .toPromise()
-        .then((result) => {
-          console.log("invoiceCreate result");
-          console.log(result.data);
-
-          if (result.error) {
-            throw new Error(result.error.message);
-          }
-        })
+    logger.info(
+      { orderId, invoiceNumber, invoiceUrl },
+      "Will notify Saleor with invoiceCreate mutation"
     );
+
+    return this.client
+      .mutation(InvoiceCreateDocument, {
+        orderId,
+        invoiceInput: {
+          url: invoiceUrl,
+          number: invoiceNumber,
+        },
+      })
+      .toPromise()
+      .then((result) => {
+        logger.info(result.data, "invoiceCreate finished");
+
+        if (result.error) {
+          throw new Error(result.error.message);
+        }
+      });
   }
 }

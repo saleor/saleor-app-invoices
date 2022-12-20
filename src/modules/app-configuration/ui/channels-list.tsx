@@ -2,6 +2,7 @@ import {
   makeStyles,
   OffsettedList,
   OffsettedListBody,
+  OffsettedListHeader,
   OffsettedListItem,
   OffsettedListItemCell,
 } from "@saleor/macaw-ui";
@@ -22,8 +23,8 @@ const useStyles = makeStyles((theme) => {
       border: `2px solid ${theme.palette.primary.main}`,
     },
     cellSlug: {
-      textAlign: "right",
       fontFamily: "monospace",
+      opacity: 0.8,
     },
   };
 });
@@ -39,6 +40,12 @@ export const ChannelsList = ({ channels, activeChannelSlug, onChannelClick }: Pr
 
   return (
     <OffsettedList gridTemplate={["1fr", "1fr"]}>
+      <OffsettedListHeader>
+        <OffsettedListItem className={styles.listItem}>
+          <OffsettedListItemCell>Channel name</OffsettedListItemCell>
+          <OffsettedListItemCell>Channel slug</OffsettedListItemCell>
+        </OffsettedListItem>
+      </OffsettedListHeader>
       <OffsettedListBody>
         {channels.map((c) => {
           return (

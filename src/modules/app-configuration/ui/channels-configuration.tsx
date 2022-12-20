@@ -9,7 +9,7 @@ import { ChannelsList } from "./channels-list";
 const useStyles = makeStyles((theme) => {
   return {
     header: { marginBottom: 20 },
-    grid: { display: "grid", gridTemplateColumns: "1fr 2fr", alignItems: "start", gap: 40 },
+    grid: { display: "grid", gridTemplateColumns: "1fr 1fr", alignItems: "start", gap: 40 },
     formContainer: {
       top: 0,
       position: "sticky",

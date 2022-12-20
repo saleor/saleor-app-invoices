@@ -4,6 +4,7 @@ import { AlertBase } from "@saleor/macaw-ui";
 import { ChannelsConfiguration } from "../modules/app-configuration/ui/channels-configuration";
 import { trpcClient } from "../modules/trpc/trpc-client";
 import { useRouter } from "next/router";
+import { Typography } from "@material-ui/core";
 
 type Tab = "channels";
 
@@ -24,9 +25,13 @@ const ConfigurationPage: NextPage = () => {
 
   return (
     <div>
-      <h1>Saleor Invoices App</h1>
+      <h1>Saleor Invoices</h1>
       <AlertBase style={alertStyle} variant="info">
-        Generate invoices for Orders in your shop
+        <Typography paragraph>Generate invoices for Orders in your shop</Typography>
+        <Typography paragraph>
+          Open any order and generate invoice. It will be uploaded and attached to the order. App
+          will use Seller data from configuration below
+        </Typography>
       </AlertBase>
 
       {/* Enable if more config available */}

@@ -37,16 +37,12 @@ export async function fetchAllMetadata(client: Client): Promise<MetadataEntry[]>
     .toPromise();
 
   if (error) {
-    console.debug("Error during fetching the metadata: ", error);
     return [];
   }
 
   return data?.app?.privateMetadata.map((md) => ({ key: md.key, value: md.value })) || [];
 }
 
-// Mutate function takes urql client and metadata entries, and construct mutation to the API.
-// Before data are send, additional query for required App ID is made.
-// The manager will use updated entries returned by this mutation to update it's cache.
 export async function mutateMetadata(client: Client, metadata: MetadataEntry[]) {
   // to update the metadata, ID is required
   const { error: idQueryError, data: idQueryData } = await client
@@ -54,7 +50,6 @@ export async function mutateMetadata(client: Client, metadata: MetadataEntry[]) 
     .toPromise();
 
   if (idQueryError) {
-    console.debug("Could not fetch the app id: ", idQueryError);
     throw new Error(
       "Could not fetch the app id. Please check if auth data for the client are valid."
     );
@@ -63,7 +58,6 @@ export async function mutateMetadata(client: Client, metadata: MetadataEntry[]) 
   const appId = idQueryData?.app?.id;
 
   if (!appId) {
-    console.debug("Missing app id");
     throw new Error("Could not fetch the app ID");
   }
 
@@ -75,7 +69,6 @@ export async function mutateMetadata(client: Client, metadata: MetadataEntry[]) 
     .toPromise();
 
   if (mutationError) {
-    console.debug("Mutation error: ", mutationError);
     throw new Error(`Mutation error: ${mutationError.message}`);
   }
 

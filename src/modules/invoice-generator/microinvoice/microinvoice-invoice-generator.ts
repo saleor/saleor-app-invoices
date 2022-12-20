@@ -80,10 +80,10 @@ export class MicroinvoiceInvoiceGenerator implements InvoiceGenerator {
                 companyAddressData.countryArea,
               ],
             },
-            {
-              label: "Tax Identifier",
-              value: "todo",
-            },
+            // {
+            //   label: "Tax Identifier",
+            //   value: "todo",
+            // },
           ],
 
           legal: [

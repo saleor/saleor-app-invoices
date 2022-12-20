@@ -4,7 +4,7 @@ import { PrivateMetadataAppConfigurator } from "./app-configurator";
 import { createSettingsManager } from "./metadata-manager";
 import { ChannelsFetcher } from "../channels/channels-fetcher";
 import { ShopInfoFetcher } from "../shop-info/shop-info-fetcher";
-import { pinoLogger } from "../../lib/logger";
+import { logger as pinoLogger } from "../../lib/logger";
 import { FallbackAppConfig } from "./fallback-app-config";
 import { appConfigInputSchema } from "./app-config-input-schema";
 
