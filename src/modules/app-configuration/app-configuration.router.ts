@@ -7,6 +7,10 @@ import { procedureWithGraphqlClient } from "../trpc/procedure-with-graphql-clien
 import { PrivateMetadataAppConfigurator } from "./app-configurator";
 import { createSettingsManager } from "./metadata-manager";
 import { z } from "zod";
+import { ChannelsFetcher } from "../channels/channels-fetcher";
+import { AppConfigContainer } from "./app-config-container";
+import { AppConfig } from "./app-config";
+import { ShopInfoFetcher } from "../shop-info/shop-info-fetcher";
 
 gql`
   query FetchChannels {
@@ -29,12 +33,39 @@ export const appConfigurationRouter = router({
       ctx.domain
     );
 
-    // todo - fetch Shop data as default?
-    const settings = (await appConfigurator.getConfig()) ?? null;
+    const savedAppConfig = (await appConfigurator.getConfig()) ?? null;
 
-    console.log(settings);
+    if (!savedAppConfig) {
+      const channelsFetcher = new ChannelsFetcher(client);
+      const shopInfoFetcher = new ShopInfoFetcher(client);
 
-    return settings;
+      const channels = (await channelsFetcher.fetchChannels()) ?? [];
+      const shopAddress = await shopInfoFetcher.fetchShopInfo();
+
+      const appConfig = channels.reduce<AppConfig>(
+        (state, channel) => {
+          return AppConfigContainer.setChannelAddress(state)(channel.slug)({
+            city: shopAddress?.companyAddress?.city ?? "",
+            cityArea: shopAddress?.companyAddress?.cityArea ?? "",
+            companyName: shopAddress?.companyAddress?.companyName ?? "",
+            country: shopAddress?.companyAddress?.country.country ?? "",
+            countryArea: shopAddress?.companyAddress?.countryArea ?? "",
+            firstName: shopAddress?.companyAddress?.firstName ?? "",
+            lastName: shopAddress?.companyAddress?.lastName ?? "",
+            postalCode: shopAddress?.companyAddress?.postalCode ?? "",
+            streetAddress1: shopAddress?.companyAddress?.streetAddress1 ?? "",
+            streetAddress2: shopAddress?.companyAddress?.streetAddress2 ?? "",
+          });
+        },
+        { shopConfigPerChannel: {} }
+      );
+
+      await appConfigurator.setConfig(appConfig);
+
+      return appConfig;
+    }
+
+    return savedAppConfig;
   }),
   setAndReplace: procedureWithGraphqlClient
     .input(

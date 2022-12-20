@@ -4,16 +4,7 @@ import { createClient } from "../../lib/graphql";
 import { gql } from "urql";
 import { router } from "../trpc/trpc-server";
 import { procedureWithGraphqlClient } from "../trpc/procedure-with-graphql-client";
-
-gql`
-  query FetchChannels {
-    channels {
-      name
-      id
-      slug
-    }
-  }
-`;
+import { ChannelsFetcher } from "./channels-fetcher";
 
 export const channelsRouter = router({
   fetch: procedureWithGraphqlClient.query(async ({ ctx, input }) => {
@@ -21,8 +12,8 @@ export const channelsRouter = router({
       Promise.resolve({ token: ctx.appToken })
     );
 
-    const data = await client.query(FetchChannelsDocument, {}).toPromise();
+    const fetcher = new ChannelsFetcher(client);
 
-    return data;
+    return fetcher.fetchChannels();
   }),
 });

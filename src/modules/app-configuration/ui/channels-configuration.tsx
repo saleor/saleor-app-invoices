@@ -63,19 +63,19 @@ export const ChannelsConfiguration = () => {
 
   useEffect(() => {
     if (isChannelsFetchSuccess) {
-      setActiveChannelSlug(channelsData!.data!.channels![0].slug ?? null);
+      setActiveChannelSlug(channelsData![0].slug ?? null);
     }
   }, [isChannelsFetchSuccess, channelsData]);
 
   const activeChannel = useMemo(() => {
     try {
-      return channelsData!.data!.channels!.find((c) => c.slug === activeChannelSlug)!;
+      return channelsData!.find((c) => c.slug === activeChannelSlug)!;
     } catch (e) {
       return null;
     }
   }, [channelsData, activeChannelSlug]);
 
-  if (isLoading || !channelsData?.data?.channels) {
+  if (isLoading || !channelsData) {
     return <LinearProgress />;
   }
 
@@ -87,7 +87,7 @@ export const ChannelsConfiguration = () => {
       <div className={styles.grid}>
         <OffsettedList gridTemplate={["1fr", "1fr"]}>
           <OffsettedListBody>
-            {channelsData.data.channels.map((c) => {
+            {channelsData.map((c) => {
               return (
                 <OffsettedListItem
                   className={clsx(styles.listItem, {
