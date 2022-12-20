@@ -7,9 +7,14 @@ import { ShopInfoFetcher } from "../shop-info/shop-info-fetcher";
 import { logger as pinoLogger } from "../../lib/logger";
 import { FallbackAppConfig } from "./fallback-app-config";
 import { appConfigInputSchema } from "./app-config-input-schema";
+import { TRPCError } from "@trpc/server";
 
 export const appConfigurationRouter = router({
   fetch: procedureWithGraphqlClient.query(async ({ ctx, input }) => {
+    if (!ctx.domain) {
+      throw new TRPCError({ message: "Auth data not found", code: "BAD_REQUEST" });
+    }
+
     const logger = pinoLogger.child({ domain: ctx.domain });
 
     logger.debug("appConfigurationRouter.fetch called");
@@ -56,6 +61,10 @@ export const appConfigurationRouter = router({
   setAndReplace: procedureWithGraphqlClient
     .input(appConfigInputSchema)
     .mutation(async ({ ctx, input }) => {
+      if (!ctx.domain) {
+        throw new TRPCError({ message: "Auth data not found", code: "BAD_REQUEST" });
+      }
+
       const appConfigurator = new PrivateMetadataAppConfigurator(
         createSettingsManager(ctx.apiClient),
         ctx.domain
