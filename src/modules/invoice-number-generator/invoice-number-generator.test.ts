@@ -4,7 +4,7 @@ import { InvoiceNumberGenerationStrategy } from "./invoice-number-generator";
 describe("InvoiceNumberGenerationStrategies", () => {
   describe("localizedDate strategy", () => {
     it("Generates proper name for US locale", () => {
-      const strategy = InvoiceNumberGenerationStrategy.localizedDate("us-US");
+      const strategy = InvoiceNumberGenerationStrategy.localizedDate("en-US");
 
       /**
        * Javascript starts counting months from 0
