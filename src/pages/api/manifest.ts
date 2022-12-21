@@ -11,7 +11,7 @@ export default createManifestHandler({
       tokenTargetUrl: `${context.appBaseUrl}/api/register`,
       appUrl: context.appBaseUrl,
       permissions: ["MANAGE_ORDERS"],
-      id: "saleor.app",
+      id: "app.saleor.invoices",
       version: packageJson.version,
       webhooks: [invoiceRequestedWebhook.getWebhookManifest(context.appBaseUrl)],
       extensions: [],
