@@ -1,6 +1,6 @@
-import { OrderFragment, OrderStatus } from "../../generated/graphql";
+import { OrderPayloadFragment, OrderStatus } from "../../generated/graphql";
 
-export const mockOrder: OrderFragment = {
+export const mockOrder: OrderPayloadFragment = {
   channel: {
     slug: "default-channel",
   },

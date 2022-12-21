@@ -1,7 +1,10 @@
 import { NextWebhookApiHandler, SaleorAsyncWebhook } from "@saleor/app-sdk/handlers/next";
 import { gql } from "urql";
 import { saleorApp } from "../../../../saleor-app";
-import { InvoiceRequestedPayloadFragment, OrderFragment } from "../../../../generated/graphql";
+import {
+  InvoiceRequestedPayloadFragment,
+  OrderPayloadFragment,
+} from "../../../../generated/graphql";
 import { createClient } from "../../../lib/graphql";
 import { SaleorInvoiceUploader } from "../../../modules/invoice-uploader/saleor-invoice-uploader";
 import { InvoiceCreateNotifier } from "../../../modules/invoice-create-notifier/invoice-create-notifier";
@@ -9,17 +12,98 @@ import {
   InvoiceNumberGenerationStrategy,
   InvoiceNumberGenerator,
 } from "../../../modules/invoice-number-generator/invoice-number-generator";
-import { mockOrder } from "../../../fixtures/mock-order";
 import { MicroinvoiceInvoiceGenerator } from "../../../modules/invoice-generator/microinvoice/microinvoice-invoice-generator";
 import { hashInvoiceFilename } from "../../../modules/invoice-file-name/hash-invoice-filename";
 import { resolveTempPdfFileLocation } from "../../../modules/invoice-file-name/resolve-temp-pdf-file-location";
 import { appConfigurationRouter } from "../../../modules/app-configuration/app-configuration.router";
 import { createLogger } from "../../../lib/logger";
 
+const OrderPayload = gql`
+  fragment Address on Address {
+    id
+    country {
+      country
+      code
+    }
+    companyName
+    cityArea
+    countryArea
+    streetAddress1
+    streetAddress2
+    postalCode
+    phone
+    firstName
+    lastName
+    city
+  }
+
+  fragment Money on Money {
+    amount
+    currency
+  }
+
+  fragment TaxedMoney on TaxedMoney {
+    currency
+    gross {
+      ...Money
+    }
+    net {
+      ...Money
+    }
+    tax {
+      ...Money
+    }
+  }
+
+  fragment OrderPayload on Order {
+    shippingPrice {
+      ...TaxedMoney
+    }
+    shippingMethodName
+    number
+
+    id
+    billingAddress {
+      ...Address
+    }
+    created
+    fulfillments {
+      created
+    }
+    status
+    number
+    total {
+      ...TaxedMoney
+    }
+    channel {
+      slug
+    }
+    lines {
+      productName
+      variantName
+      quantity
+      totalPrice {
+        ...TaxedMoney
+      }
+    }
+    shippingPrice {
+      ...TaxedMoney
+    }
+    shippingMethodName
+  }
+`;
+
 export const InvoiceCreatedPayloadFragment = gql`
+  ${OrderPayload}
+
   fragment InvoiceRequestedPayload on InvoiceRequested {
     invoice {
       id
+    }
+    order {
+      ... on Order {
+        ...OrderPayload
+      }
     }
   }
 `;
@@ -50,17 +134,19 @@ export const handler: NextWebhookApiHandler<InvoiceRequestedPayloadFragment> = a
   context
 ) => {
   const { authData, payload, baseUrl } = context;
-
   const logger = createLogger({ domain: authData.domain, url: baseUrl });
 
-  const order = mockOrder; // todo get from payload when fixed
+  const order = payload.order;
 
   logger.info({ orderId: order.id }, "Received event INVOICE_REQUESTED");
-  logger.debug(order);
+  logger.debug(order, "Order from payload:");
 
-  const orderId = mockOrder.id;
+  const orderId = order.id;
+  /**
+   * TODO -> should generate from generation date or order date?
+   */
   const invoiceName = invoiceNumberGenerator.generateFromOrder(
-    order as OrderFragment,
+    order as OrderPayloadFragment,
     InvoiceNumberGenerationStrategy.localizedDate("en-US") // todo connect locale -> where from?
   );
 

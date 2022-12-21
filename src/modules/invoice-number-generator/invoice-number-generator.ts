@@ -1,11 +1,11 @@
-import {OrderFragment} from "../../../generated/graphql";
+import {OrderPayloadFragment} from "../../../generated/graphql";
 
 interface IInvoiceNumberGenerationStrategy {
-    (order: OrderFragment): string;
+    (order: OrderPayloadFragment): string;
 }
 
 export const InvoiceNumberGenerationStrategy = {
-    localizedDate: (locale: string) => (order: Pick<OrderFragment, 'created'>) => {
+    localizedDate: (locale: string) => (order: Pick<OrderPayloadFragment, 'created'>) => {
         const orderCreatedDate = new Date(order.created);
 
         return Intl.DateTimeFormat(locale,).format(orderCreatedDate)
@@ -13,7 +13,7 @@ export const InvoiceNumberGenerationStrategy = {
 } satisfies Record<string, (...args: any[]) => IInvoiceNumberGenerationStrategy>
 
 export class InvoiceNumberGenerator {
-    generateFromOrder(order: OrderFragment, strategy: IInvoiceNumberGenerationStrategy): string {
+    generateFromOrder(order: OrderPayloadFragment, strategy: IInvoiceNumberGenerationStrategy): string {
         return strategy(order)
     }
 }

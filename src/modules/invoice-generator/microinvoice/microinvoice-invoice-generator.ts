@@ -1,5 +1,5 @@
 import { InvoiceGenerator } from "../invoice-generator";
-import { Order, OrderFragment } from "../../../../generated/graphql";
+import { Order, OrderPayloadFragment } from "../../../../generated/graphql";
 import { SellerShopConfig } from "../../app-configuration/app-config";
 const Microinvoice = require("microinvoice");
 
@@ -10,7 +10,7 @@ export class MicroinvoiceInvoiceGenerator implements InvoiceGenerator {
     }
   ) {}
   async generate(input: {
-    order: OrderFragment;
+    order: OrderPayloadFragment;
     invoiceNumber: string;
     filename: string;
     companyAddressData: SellerShopConfig["address"];
@@ -127,6 +127,18 @@ export class MicroinvoiceInvoiceGenerator implements InvoiceGenerator {
                   },
                 ];
               }),
+              [
+                {
+                  value: order.shippingMethodName,
+                },
+                {
+                  value: "-",
+                },
+                {
+                  value: order.shippingPrice.gross.amount,
+                  price: true,
+                },
+              ],
             ],
 
             total: [

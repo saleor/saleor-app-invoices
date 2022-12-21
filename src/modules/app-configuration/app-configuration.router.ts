@@ -65,6 +65,10 @@ export const appConfigurationRouter = router({
         throw new TRPCError({ message: "Auth data not found", code: "BAD_REQUEST" });
       }
 
+      const logger = pinoLogger.child({ domain: ctx.domain });
+
+      logger.info(input, "appConfigurationRouter.setAndReplace called with input");
+
       const appConfigurator = new PrivateMetadataAppConfigurator(
         createSettingsManager(ctx.apiClient),
         ctx.domain

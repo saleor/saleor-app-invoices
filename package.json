@@ -7,7 +7,8 @@
     "build": "pnpm generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "fetch-schema": "curl https://raw.githubusercontent.com/saleor/saleor/${npm_package_saleor_schemaVersion}/saleor/graphql/schema.graphql > graphql/schema.graphql",
+    "fetch-schema": "echo '⛔️ ERROR fetching wrong schema, replace to production one' && curl https://raw.githubusercontent.com/saleor/saleor/main/saleor/graphql/schema.graphql > graphql/schema.graphql",
+    "fetch-schema-todo": "curl https://raw.githubusercontent.com/saleor/saleor/${npm_package_saleor_schemaVersion}/saleor/graphql/schema.graphql > graphql/schema.graphql",
     "generate": "graphql-codegen",
     "test": "vitest",
     "test:ci": "CI=true vitest --coverage"
@@ -18,7 +19,6 @@
   "dependencies": {
     "@material-ui/core": "^4.12.4",
     "@material-ui/icons": "^4.11.3",
-    "@material-ui/lab": "4.0.0-alpha.61",
     "@saleor/app-sdk": "0.24.0",
     "@saleor/macaw-ui": "^0.7.0",
     "@tanstack/react-query": "^4.19.1",
