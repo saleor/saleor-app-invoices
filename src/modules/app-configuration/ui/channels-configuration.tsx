@@ -5,6 +5,7 @@ import { makeStyles } from "@saleor/macaw-ui";
 import { AppConfigContainer } from "../app-config-container";
 import { AddressForm } from "./address-form";
 import { ChannelsList } from "./channels-list";
+import { actions, useAppBridge } from "@saleor/app-sdk/app-bridge";
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -19,6 +20,7 @@ const useStyles = makeStyles((theme) => {
 
 export const ChannelsConfiguration = () => {
   const styles = useStyles();
+  const { appBridge } = useAppBridge();
 
   const { data: configurationData, refetch: refetchConfig } =
     trpcClient.appConfiguration.fetch.useQuery();
@@ -30,6 +32,9 @@ export const ChannelsConfiguration = () => {
   const { mutate, error: saveError } = trpcClient.appConfiguration.setAndReplace.useMutation({
     onSuccess() {
       refetchConfig();
+      appBridge?.dispatch(
+        actions.Notification({ title: "Success", text: "Saved app configuration" })
+      );
     },
   });
 
