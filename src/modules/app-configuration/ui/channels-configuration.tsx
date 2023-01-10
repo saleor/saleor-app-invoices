@@ -33,7 +33,11 @@ export const ChannelsConfiguration = () => {
     onSuccess() {
       refetchConfig();
       appBridge?.dispatch(
-        actions.Notification({ title: "Success", text: "Saved app configuration" })
+        actions.Notification({
+          title: "Success",
+          text: "Saved app configuration",
+          status: "success",
+        })
       );
     },
   });
