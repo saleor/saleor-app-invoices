@@ -3,6 +3,7 @@ import { createClient } from "../../lib/graphql";
 import { middleware, procedure } from "./trpc-server";
 import { saleorApp } from "../../../saleor-app";
 import { TRPCError } from "@trpc/server";
+import { ProtectedHandlerError } from "@saleor/app-sdk/handlers/next";
 
 const attachAppToken = middleware(async ({ ctx, next }) => {
   if (!ctx.domain) {
@@ -19,6 +20,12 @@ const attachAppToken = middleware(async ({ ctx, next }) => {
       code: "UNAUTHORIZED",
       message: "Missing auth data",
     });
+  }
+
+  try {
+    await verifyJWT({ appId: authData.appId, token: ctx.token, apiUrl: saleorApiUrl });
+  } catch (e) {
+    throw new ProtectedHandlerError("JWT verification failed: ", "JWT_VERIFICATION_FAILED");
   }
 
   return next({
