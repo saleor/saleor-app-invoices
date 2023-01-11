@@ -143,17 +143,17 @@ export class MicroinvoiceInvoiceGenerator implements InvoiceGenerator {
 
             total: [
               {
-                label: "Total without VAT",
+                label: "Total net",
                 value: order.total.net.amount,
                 price: true,
               },
               {
-                label: "VAT Value",
+                label: "Tax value",
                 value: order.total.tax.amount,
                 price: true,
               },
               {
-                label: "Total paid with VAT",
+                label: "Total with tax",
                 value: order.total.gross.amount,
                 price: true,
               },
