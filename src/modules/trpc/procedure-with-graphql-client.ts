@@ -42,6 +42,7 @@ const attachAppToken = middleware(async ({ ctx, next }) => {
   return next({
     ctx: {
       appToken: authData.token,
+      saleorApiUrl: authData.saleorApiUrl,
     },
   });
 });
@@ -52,7 +53,7 @@ const attachAppToken = middleware(async ({ ctx, next }) => {
 export const procedureWithGraphqlClient = procedure
   .use(attachAppToken)
   .use(async ({ ctx, next }) => {
-    const client = createClient(`https://${ctx.domain}/graphql/`, async () =>
+    const client = createClient(ctx.saleorApiUrl, async () =>
       Promise.resolve({ token: ctx.appToken })
     );
 
