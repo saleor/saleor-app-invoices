@@ -1,5 +1,5 @@
 import { createClient } from "../../lib/graphql";
-
+import { verifyJWT } from "@saleor/app-sdk"; //todo
 import { middleware, procedure } from "./trpc-server";
 import { saleorApp } from "../../../saleor-app";
 import { TRPCError } from "@trpc/server";
@@ -23,7 +23,7 @@ const attachAppToken = middleware(async ({ ctx, next }) => {
   }
 
   try {
-    await verifyJWT({ appId: authData.appId, token: ctx.token, apiUrl: saleorApiUrl });
+    await verifyJWT({ appId: authData.appId, token: ctx.token, apiUrl: authData.apiUrl });
   } catch (e) {
     throw new ProtectedHandlerError("JWT verification failed: ", "JWT_VERIFICATION_FAILED");
   }
