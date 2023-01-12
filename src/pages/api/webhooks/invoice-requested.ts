@@ -161,7 +161,7 @@ export const handler: NextWebhookApiHandler<InvoiceRequestedPayloadFragment> = a
   }
 
   try {
-    const client = createClient(`https://${authData.domain}/graphql/`, async () =>
+    const client = createClient(authData.saleorApiUrl, async () =>
       Promise.resolve({ token: authData.token })
     );
 

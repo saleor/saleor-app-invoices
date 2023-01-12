@@ -6,7 +6,7 @@ import { ChannelFragment } from "../../../generated/graphql";
 
 export const channelsRouter = router({
   fetch: procedureWithGraphqlClient.query(async ({ ctx, input }): Promise<ChannelFragment[]> => {
-    const client = createClient(`https://${ctx.domain}/graphql/`, async () =>
+    const client = createClient(ctx.saleorApiUrl, async () =>
       Promise.resolve({ token: ctx.appToken })
     );
 

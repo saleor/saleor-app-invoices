@@ -1,14 +1,22 @@
 import { createClient } from "../../lib/graphql";
-
+import { verifyJWT } from "@saleor/app-sdk/verify-jwt"; //todo
 import { middleware, procedure } from "./trpc-server";
 import { saleorApp } from "../../../saleor-app";
 import { TRPCError } from "@trpc/server";
+import { ProtectedHandlerError } from "@saleor/app-sdk/handlers/next";
 
 const attachAppToken = middleware(async ({ ctx, next }) => {
   if (!ctx.domain) {
     throw new TRPCError({
       code: "BAD_REQUEST",
       message: "Missing domain in request",
+    });
+  }
+
+  if (!ctx.token) {
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Missing token in request",
     });
   }
 
@@ -21,9 +29,20 @@ const attachAppToken = middleware(async ({ ctx, next }) => {
     });
   }
 
+  try {
+    await verifyJWT({
+      appId: authData.appId,
+      token: ctx.token,
+      saleorApiUrl: authData.saleorApiUrl,
+    });
+  } catch (e) {
+    throw new ProtectedHandlerError("JWT verification failed: ", "JWT_VERIFICATION_FAILED");
+  }
+
   return next({
     ctx: {
       appToken: authData.token,
+      saleorApiUrl: authData.saleorApiUrl,
     },
   });
 });
@@ -34,7 +53,7 @@ const attachAppToken = middleware(async ({ ctx, next }) => {
 export const procedureWithGraphqlClient = procedure
   .use(attachAppToken)
   .use(async ({ ctx, next }) => {
-    const client = createClient(`https://${ctx.domain}/graphql/`, async () =>
+    const client = createClient(ctx.saleorApiUrl, async () =>
       Promise.resolve({ token: ctx.appToken })
     );
 
