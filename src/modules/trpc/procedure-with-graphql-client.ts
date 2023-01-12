@@ -1,5 +1,5 @@
 import { createClient } from "../../lib/graphql";
-import { verifyJWT } from "@saleor/app-sdk"; //todo
+import { verifyJWT } from "@saleor/app-sdk/verify-jwt"; //todo
 import { middleware, procedure } from "./trpc-server";
 import { saleorApp } from "../../../saleor-app";
 import { TRPCError } from "@trpc/server";
@@ -7,6 +7,13 @@ import { ProtectedHandlerError } from "@saleor/app-sdk/handlers/next";
 
 const attachAppToken = middleware(async ({ ctx, next }) => {
   if (!ctx.domain) {
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Missing domain in request",
+    });
+  }
+
+  if (!ctx.token) {
     throw new TRPCError({
       code: "BAD_REQUEST",
       message: "Missing domain in request",
@@ -23,7 +30,11 @@ const attachAppToken = middleware(async ({ ctx, next }) => {
   }
 
   try {
-    await verifyJWT({ appId: authData.appId, token: ctx.token, apiUrl: authData.apiUrl });
+    await verifyJWT({
+      appId: authData.appId,
+      token: ctx.token,
+      saleorApiUrl: authData.saleorApiUrl,
+    });
   } catch (e) {
     throw new ProtectedHandlerError("JWT verification failed: ", "JWT_VERIFICATION_FAILED");
   }
