@@ -16,7 +16,7 @@ const attachAppToken = middleware(async ({ ctx, next }) => {
   if (!ctx.token) {
     throw new TRPCError({
       code: "BAD_REQUEST",
-      message: "Missing domain in request",
+      message: "Missing token in request",
     });
   }
 
