@@ -46,8 +46,8 @@ function NextApp({ Component, pageProps }: AppProps) {
     <NoSSRWrapper>
       <AppBridgeProvider appBridgeInstance={appBridgeInstance}>
         <GraphQLProvider>
-          <ThemeProvider overrides={themeOverrides} ssr>
-            {/*<ThemeSynchronizer />*/}
+          <ThemeProvider overrides={themeOverrides} ssr={false}>
+            <ThemeSynchronizer />
             <RoutePropagator />
             <Component {...pageProps} />
           </ThemeProvider>
