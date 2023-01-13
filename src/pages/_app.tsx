@@ -47,7 +47,7 @@ function NextApp({ Component, pageProps }: AppProps) {
       <AppBridgeProvider appBridgeInstance={appBridgeInstance}>
         <GraphQLProvider>
           <ThemeProvider overrides={themeOverrides} ssr>
-            <ThemeSynchronizer />
+            {/*<ThemeSynchronizer />*/}
             <RoutePropagator />
             <Component {...pageProps} />
           </ThemeProvider>

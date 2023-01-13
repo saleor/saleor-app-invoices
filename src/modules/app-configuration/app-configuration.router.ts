@@ -1,5 +1,5 @@
 import { router } from "../trpc/trpc-server";
-import { procedureWithGraphqlClient } from "../trpc/procedure-with-graphql-client";
+import { protectedClientProcedure } from "../trpc/protected-client-procedure";
 import { PrivateMetadataAppConfigurator } from "./app-configurator";
 import { createSettingsManager } from "./metadata-manager";
 import { ChannelsFetcher } from "../channels/channels-fetcher";
@@ -7,21 +7,16 @@ import { ShopInfoFetcher } from "../shop-info/shop-info-fetcher";
 import { logger as pinoLogger } from "../../lib/logger";
 import { FallbackAppConfig } from "./fallback-app-config";
 import { appConfigInputSchema } from "./app-config-input-schema";
-import { TRPCError } from "@trpc/server";
 
 export const appConfigurationRouter = router({
-  fetch: procedureWithGraphqlClient.query(async ({ ctx, input }) => {
-    if (!ctx.domain) {
-      throw new TRPCError({ message: "Auth data not found", code: "BAD_REQUEST" });
-    }
-
-    const logger = pinoLogger.child({ domain: ctx.domain });
+  fetch: protectedClientProcedure.query(async ({ ctx, input }) => {
+    const logger = pinoLogger.child({ saleorApiUrl: ctx.saleorApiUrl });
 
     logger.debug("appConfigurationRouter.fetch called");
 
     const appConfigurator = new PrivateMetadataAppConfigurator(
       createSettingsManager(ctx.apiClient),
-      ctx.domain
+      ctx.saleorApiUrl
     );
 
     const savedAppConfig = (await appConfigurator.getConfig()) ?? null;
@@ -58,20 +53,16 @@ export const appConfigurationRouter = router({
 
     return appConfig;
   }),
-  setAndReplace: procedureWithGraphqlClient
+  setAndReplace: protectedClientProcedure
     .input(appConfigInputSchema)
     .mutation(async ({ ctx, input }) => {
-      if (!ctx.domain) {
-        throw new TRPCError({ message: "Auth data not found", code: "BAD_REQUEST" });
-      }
-
-      const logger = pinoLogger.child({ domain: ctx.domain });
+      const logger = pinoLogger.child({ saleorApiUrl: ctx.saleorApiUrl });
 
       logger.info(input, "appConfigurationRouter.setAndReplace called with input");
 
       const appConfigurator = new PrivateMetadataAppConfigurator(
         createSettingsManager(ctx.apiClient),
-        ctx.domain
+        ctx.saleorApiUrl
       );
 
       await appConfigurator.setConfig(input);

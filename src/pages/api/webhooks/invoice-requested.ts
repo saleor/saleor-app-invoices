@@ -134,7 +134,7 @@ export const handler: NextWebhookApiHandler<InvoiceRequestedPayloadFragment> = a
   context
 ) => {
   const { authData, payload, baseUrl } = context;
-  const logger = createLogger({ domain: authData.domain, url: baseUrl });
+  const logger = createLogger({ domain: authData.saleorApiUrl, url: baseUrl });
 
   const order = payload.order;
 
