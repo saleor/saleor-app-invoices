@@ -12,8 +12,8 @@ specifiers:
   '@material-ui/core': ^4.12.4
   '@material-ui/icons': ^4.11.3
   '@material-ui/lab': 4.0.0-alpha.61
-  '@saleor/app-sdk': 0.24.0
-  '@saleor/macaw-ui': ^0.7.0
+  '@saleor/app-sdk': 0.26.0
+  '@saleor/macaw-ui': ^0.7.2
   '@tanstack/react-query': ^4.19.1
   '@trpc/client': ^10.4.3
   '@trpc/next': ^10.4.3
@@ -57,8 +57,8 @@ dependencies:
   '@material-ui/core': 4.12.4_rj7ozvcq3uehdlnj3cbwzbi5ce
   '@material-ui/icons': 4.11.3_3mlwvtnnvz4efep55wa5m5dc4e
   '@material-ui/lab': 4.0.0-alpha.61_3mlwvtnnvz4efep55wa5m5dc4e
-  '@saleor/app-sdk': 0.24.0_6jx7hpii6hgsrmhxgqrmo3277u
-  '@saleor/macaw-ui': 0.7.0_k2kuy4f2rkqfztjzphbs3himfi
+  '@saleor/app-sdk': 0.26.0_6jx7hpii6hgsrmhxgqrmo3277u
+  '@saleor/macaw-ui': 0.7.2_k2kuy4f2rkqfztjzphbs3himfi
   '@tanstack/react-query': 4.20.4_biqbaboplfbrettd7655fr4n2y
   '@trpc/client': 10.5.0_@trpc+server@10.5.0
   '@trpc/next': 10.5.0_qn3c4vygyejwjgeqp7w777mrhm
@@ -1008,6 +1008,7 @@ packages:
 
   /@floating-ui/react-dom-interactions/0.5.0_rj7ozvcq3uehdlnj3cbwzbi5ce:
     resolution: {integrity: sha512-rfON7mkHjCeogd0BSXPa8GBp1TMxEytJQqGVlCouSUonJ4POqdHsqcxRnCh0yAaGVaL/nB/J1vq28V4RdoLszg==}
+    deprecated: Package renamed to @floating-ui/react
     dependencies:
       '@floating-ui/react-dom': 0.7.2_rj7ozvcq3uehdlnj3cbwzbi5ce
       aria-hidden: 1.2.1_iapumuv4e6jcjznwuxpf4tt22e
@@ -1927,8 +1928,8 @@ packages:
     resolution: {integrity: sha512-sXo/qW2/pAcmT43VoRKOJbDOfV3cYpq3szSVfIThQXNt+E4DfKj361vaAt3c88U5tPUxzEswam7GW48PJqtKAg==}
     dev: true
 
-  /@saleor/app-sdk/0.24.0_6jx7hpii6hgsrmhxgqrmo3277u:
-    resolution: {integrity: sha512-vrWRcrB1D2EA0d/yzPFf+npfAOukIqBm6FzQhWDsHI1v+ZPjaZkjmiqMtjWvGrhRuRKtEJ9YHsAQYjNOhc1Pvg==}
+  /@saleor/app-sdk/0.26.0_6jx7hpii6hgsrmhxgqrmo3277u:
+    resolution: {integrity: sha512-OdaWKpvgMBYY/O0RJdHqgyurZXsVJDe1De1n6rU+6Au8C7VusMLQWbjS0VVbV3UJsEKJmbKSgBUSXSD283a01g==}
     peerDependencies:
       next: '>=12'
       react: '>=17'
@@ -1937,21 +1938,19 @@ packages:
       debug: 4.3.4
       fast-glob: 3.2.12
       graphql: 16.6.0
-      jose: 4.11.0
+      jose: 4.11.2
       next: 13.0.6_biqbaboplfbrettd7655fr4n2y
-      node-fetch: 2.6.7
       raw-body: 2.5.1
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       retes: 0.33.0
       uuid: 8.3.2
     transitivePeerDependencies:
-      - encoding
       - supports-color
     dev: false
 
-  /@saleor/macaw-ui/0.7.0_k2kuy4f2rkqfztjzphbs3himfi:
-    resolution: {integrity: sha512-RslkWPkjV8v0P5tz9uJJAS8cj3jGlMsmv8Z8jmteb/Uz+6vfGepAClUBrHt2fby9JRHivPZyn9eBbYW3xNb8Yw==}
+  /@saleor/macaw-ui/0.7.2_k2kuy4f2rkqfztjzphbs3himfi:
+    resolution: {integrity: sha512-Fli7fhTWuHu7q2CzxwTUpB4x9HYaxHSAzCLZLA23VY1ieIWbCxbsXadMiMGWp/nuYitswMr6JXMm+1SDe9K8LQ==}
     engines: {node: '>=16 <19'}
     peerDependencies:
       '@material-ui/core': ^4.11.2
@@ -4840,8 +4839,8 @@ packages:
       istanbul-lib-report: 3.0.0
     dev: true
 
-  /jose/4.11.0:
-    resolution: {integrity: sha512-wLe+lJHeG8Xt6uEubS4x0LVjS/3kXXu9dGoj9BNnlhYq7Kts0Pbb2pvv5KiI0yaKH/eaiR0LUOBhOVo9ktd05A==}
+  /jose/4.11.2:
+    resolution: {integrity: sha512-njj0VL2TsIxCtgzhO+9RRobBvws4oYyCM8TpvoUQwl/MbIM3NFJRR9+e6x0sS5xXaP1t6OCBkaBME98OV9zU5A==}
     dev: false
 
   /joycon/3.1.1:

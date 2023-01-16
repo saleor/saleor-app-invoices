@@ -17,6 +17,7 @@ import { hashInvoiceFilename } from "../../../modules/invoice-file-name/hash-inv
 import { resolveTempPdfFileLocation } from "../../../modules/invoice-file-name/resolve-temp-pdf-file-location";
 import { appConfigurationRouter } from "../../../modules/app-configuration/app-configuration.router";
 import { createLogger } from "../../../lib/logger";
+import { GetAppConfigurationService } from "../../../modules/app-configuration/get-app-configuration.service";
 
 const OrderPayload = gql`
   fragment Address on Address {
@@ -134,7 +135,7 @@ export const handler: NextWebhookApiHandler<InvoiceRequestedPayloadFragment> = a
   context
 ) => {
   const { authData, payload, baseUrl } = context;
-  const logger = createLogger({ domain: authData.domain, url: baseUrl });
+  const logger = createLogger({ domain: authData.saleorApiUrl, url: baseUrl });
 
   const order = payload.order;
 
@@ -161,7 +162,7 @@ export const handler: NextWebhookApiHandler<InvoiceRequestedPayloadFragment> = a
   }
 
   try {
-    const client = createClient(`https://${authData.domain}/graphql/`, async () =>
+    const client = createClient(authData.saleorApiUrl, async () =>
       Promise.resolve({ token: authData.token })
     );
 
@@ -172,8 +173,10 @@ export const handler: NextWebhookApiHandler<InvoiceRequestedPayloadFragment> = a
     const tempPdfLocation = resolveTempPdfFileLocation(hashedInvoiceFileName);
     logger.debug({ tempPdfLocation });
 
-    const configurationCaller = appConfigurationRouter.createCaller(authData);
-    const appConfig = await configurationCaller.fetch();
+    const appConfig = await new GetAppConfigurationService({
+      saleorApiUrl: authData.saleorApiUrl,
+      apiClient: client,
+    }).getConfiguration();
 
     await new MicroinvoiceInvoiceGenerator()
       .generate({
