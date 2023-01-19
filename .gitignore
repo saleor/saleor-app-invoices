@@ -49,3 +49,6 @@ generated/
 .sentryclirc
 test-invoice.pdf
 .env
+# Sentry
+.sentryclirc
+sentry.properties
