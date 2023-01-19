@@ -4,24 +4,11 @@
 
 - Saleor API 3.10 ❗️
 
-## TODO
-- [ ] - change mocked order to use order from payload
+## About Saleor Invoices app
 
-### What is Saleor App
-
-Saleor App is the fastest way of extending Saleor with custom logic using [asynchronous](https://docs.saleor.io/docs/3.x/developer/extending/apps/asynchronous-webhooks) and [synchronous](https://docs.saleor.io/docs/3.x/developer/extending/apps/synchronous-webhooks) webhooks (and vast Saleor's API). In most cases, creating an App consists of two tasks:
-
-- Writing webhook's code executing your custom logic.
-- Developing configuration UI to be displayed in Saleor Dashboard via specialized view (designated in the App's manifest).
-
-### What's included?
-
-- 🚀 Communication between Saleor instance and Saleor App
-- 📖 Manifest with webhooks using custom query
-
-### Why Next.js
-
-You can use any preferred technology to create Saleor Apps, but Next.js is among the most efficient for two reasons. The first is the simplicity of maintaining your API endpoints/webhooks and your apps' configuration React front-end in a single, well-organized project. The second reason is the ease and quality of local development and deployment.
+- Generates invoice PDF for each order after invoice is requested (e.g. via dashboard/orders)
+- Uploads PDF to Saleor built-in file storage
+- Allows to configure shop billing data per each channel
 
 ### Learn more about Apps
 
