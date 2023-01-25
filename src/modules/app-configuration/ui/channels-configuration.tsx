@@ -66,9 +66,6 @@ export const ChannelsConfiguration = () => {
 
   return (
     <div>
-      <Typography className={styles.header} variant="subtitle1">
-        Configure seller details visible on the invoice
-      </Typography>
       <div className={styles.grid}>
         <ChannelsList
           channels={channels.data}
