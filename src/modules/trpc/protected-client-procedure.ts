@@ -38,8 +38,13 @@ const attachAppToken = middleware(async ({ ctx, next }) => {
   });
 });
 
-const validateClientToken = middleware(async ({ ctx, next }) => {
-  logger.debug("validateClientToken middleware");
+const validateClientToken = middleware(async ({ ctx, next, meta }) => {
+  logger.debug(
+    {
+      permissions: meta?.requiredClientPermissions,
+    },
+    "Calling validateClientToken middleware with permissions required"
+  );
 
   if (!ctx.token) {
     throw new TRPCError({
@@ -71,6 +76,7 @@ const validateClientToken = middleware(async ({ ctx, next }) => {
       appId: ctx.appId,
       token: ctx.token,
       saleorApiUrl: ctx.saleorApiUrl,
+      requiredPermissions: meta?.requiredClientPermissions ?? [],
     });
   } catch (e) {
     logger.debug("JWT verification failed, throwing");
