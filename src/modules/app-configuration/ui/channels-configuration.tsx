@@ -1,11 +1,12 @@
 import { trpcClient } from "../../trpc/trpc-client";
-import { LinearProgress, Paper, Typography } from "@material-ui/core";
+import { LinearProgress, Link, Paper, Typography } from "@material-ui/core";
 import React, { useEffect, useMemo, useState } from "react";
 import { makeStyles } from "@saleor/macaw-ui";
 import { AppConfigContainer } from "../app-config-container";
 import { AddressForm } from "./address-form";
 import { ChannelsList } from "./channels-list";
 import { actions, useAppBridge } from "@saleor/app-sdk/app-bridge";
+import { AppColumnsLayout } from "../../ui/app-columns-layout";
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -14,6 +15,9 @@ const useStyles = makeStyles((theme) => {
     formContainer: {
       top: 0,
       position: "sticky",
+    },
+    instructionsContainer: {
+      padding: 15,
     },
   };
 });
@@ -65,36 +69,70 @@ export const ChannelsConfiguration = () => {
   }
 
   return (
-    <div>
-      <div className={styles.grid}>
-        <ChannelsList
-          channels={channels.data}
-          activeChannelSlug={activeChannel.slug}
-          onChannelClick={setActiveChannelSlug}
-        />
+    <AppColumnsLayout>
+      <ChannelsList
+        channels={channels.data}
+        activeChannelSlug={activeChannel.slug}
+        onChannelClick={setActiveChannelSlug}
+      />
 
-        {activeChannel && (
-          <Paper elevation={0} className={styles.formContainer}>
-            <AddressForm
-              channelID={activeChannel.id}
-              key={activeChannelSlug}
-              channelSlug={activeChannel.slug}
-              onSubmit={async (data) => {
-                const newConfig = AppConfigContainer.setChannelAddress(configurationData)(
-                  activeChannel.slug
-                )(data);
-
-                mutate(newConfig);
-              }}
-              initialData={AppConfigContainer.getChannelAddress(configurationData)(
+      {activeChannel ? (
+        <Paper elevation={0} className={styles.formContainer}>
+          <AddressForm
+            channelID={activeChannel.id}
+            key={activeChannelSlug}
+            channelSlug={activeChannel.slug}
+            onSubmit={async (data) => {
+              const newConfig = AppConfigContainer.setChannelAddress(configurationData)(
                 activeChannel.slug
-              )}
-              channelName={activeChannel?.name ?? activeChannelSlug}
-            />
-            {saveError && <span>{saveError.message}</span>}
-          </Paper>
-        )}
-      </div>
-    </div>
+              )(data);
+
+              mutate(newConfig);
+            }}
+            initialData={AppConfigContainer.getChannelAddress(configurationData)(
+              activeChannel.slug
+            )}
+            channelName={activeChannel?.name ?? activeChannelSlug}
+          />
+          {saveError && <span>{saveError.message}</span>}
+        </Paper>
+      ) : null}
+      <Paper elevation={0} className={styles.instructionsContainer}>
+        <Typography paragraph variant="h4">
+          Generate invoices for orders in your shop
+        </Typography>
+        <Typography paragraph>
+          Shop data on the invoice an be configured per channel. If not set it will use shop data
+          from{" "}
+          <Link
+            onClick={() => {
+              appBridge?.dispatch(
+                actions.Redirect({
+                  to: "/site-settings",
+                })
+              );
+            }}
+          >
+            the configuration
+          </Link>
+        </Typography>
+        <Typography>
+          Go to{" "}
+          <Link
+            onClick={() => {
+              appBridge?.dispatch(
+                actions.Redirect({
+                  to: "/orders",
+                })
+              );
+            }}
+          >
+            Orders
+          </Link>{" "}
+          and open any Order. Then click <strong>Invoices -{">"} Generate</strong>. Invoice will be
+          added to the order page
+        </Typography>
+      </Paper>
+    </AppColumnsLayout>
   );
 };

@@ -7,10 +7,32 @@ import { MainBar } from "../modules/ui/main-bar";
 import { Button, makeStyles } from "@saleor/macaw-ui";
 import { GitHub, OfflineBoltOutlined } from "@material-ui/icons";
 import { actions, useAppBridge } from "@saleor/app-sdk/app-bridge";
+import appIcon from "../app-invoices-icon.svg";
+import Image from "next/image";
 
 const useStyles = makeStyles({
   buttonsGrid: { display: "flex", gap: 10 },
+  topBar: {
+    marginBottom: 32,
+  },
+  appIconContainer: {
+    background: `rgb(227, 149, 60)`,
+    padding: 10,
+    borderRadius: "50%",
+    width: 50,
+    height: 50,
+  },
 });
+
+const AppIcon = () => {
+  const styles = useStyles();
+
+  return (
+    <div className={styles.appIconContainer}>
+      <Image width={30} height={30} alt="icon" src={appIcon} />
+    </div>
+  );
+};
 
 const ConfigurationPage: NextPage = () => {
   const styles = useStyles();
@@ -37,6 +59,8 @@ const ConfigurationPage: NextPage = () => {
   return (
     <div>
       <MainBar
+        icon={<AppIcon />}
+        className={styles.topBar}
         name="Saleor Invoices"
         author="By Saleor Commerce"
         rightColumnContent={
