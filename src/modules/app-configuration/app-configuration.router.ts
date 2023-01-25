@@ -18,11 +18,12 @@ export const appConfigurationRouter = router({
     }).getConfiguration();
   }),
   setAndReplace: protectedClientProcedure
+    .meta({ requiredClientPermissions: ["MANAGE_APPS"] })
     .input(appConfigInputSchema)
     .mutation(async ({ ctx, input }) => {
       const logger = pinoLogger.child({ saleorApiUrl: ctx.saleorApiUrl });
 
-      logger.info(input, "appConfigurationRouter.setAndReplace called with input");
+      logger.debug(input, "appConfigurationRouter.setAndReplace called with input");
 
       const appConfigurator = new PrivateMetadataAppConfigurator(
         createSettingsManager(ctx.apiClient),
