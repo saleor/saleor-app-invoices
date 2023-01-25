@@ -3,14 +3,52 @@ import React, { useEffect } from "react";
 import { ChannelsConfiguration } from "../modules/app-configuration/ui/channels-configuration";
 import { trpcClient } from "../modules/trpc/trpc-client";
 import { useRouter } from "next/router";
-import { MainInfo } from "../modules/ui/main-info";
+import { MainBar } from "../modules/ui/main-bar";
+import { Button, makeStyles } from "@saleor/macaw-ui";
+import { GitHub, OfflineBoltOutlined } from "@material-ui/icons";
+import { actions, useAppBridge } from "@saleor/app-sdk/app-bridge";
+import appIcon from "../app-invoices-icon.svg";
+import Image from "next/image";
 
-type Tab = "channels";
+const useStyles = makeStyles({
+  buttonsGrid: { display: "flex", gap: 10 },
+  topBar: {
+    marginBottom: 32,
+  },
+  appIconContainer: {
+    background: `rgb(227, 149, 60)`,
+    padding: 10,
+    borderRadius: "50%",
+    width: 50,
+    height: 50,
+  },
+});
+
+const AppIcon = () => {
+  const styles = useStyles();
+
+  return (
+    <div className={styles.appIconContainer}>
+      <Image width={30} height={30} alt="icon" src={appIcon} />
+    </div>
+  );
+};
 
 const ConfigurationPage: NextPage = () => {
-  const [activeTab, setActiveTab] = React.useState<Tab>("channels");
+  const styles = useStyles();
   const channels = trpcClient.channels.fetch.useQuery();
   const router = useRouter();
+
+  const { appBridge } = useAppBridge();
+
+  const openInNewTab = (url: string) => {
+    appBridge?.dispatch(
+      actions.Redirect({
+        to: url,
+        newContext: true,
+      })
+    );
+  };
 
   useEffect(() => {
     if (channels.isSuccess && channels.data.length === 0) {
@@ -20,20 +58,35 @@ const ConfigurationPage: NextPage = () => {
 
   return (
     <div>
-      <h1>Saleor Invoices</h1>
-      <MainInfo />
-
-      {/* Enable if more config available */}
-      {/*<PageTabs*/}
-      {/*  style={{ marginBottom: 20 }}*/}
-      {/*  value={activeTab}*/}
-      {/*  onChange={(e) => setActiveTab(e as Tab)}*/}
-      {/*>*/}
-      {/*  <PageTab value="channels" label="Channels configuration" />*/}
-      {/*</PageTabs>*/}
-      {/*<Divider style={{ marginBottom: 20 }} />*/}
-
-      {activeTab === "channels" && <ChannelsConfiguration />}
+      <MainBar
+        icon={<AppIcon />}
+        className={styles.topBar}
+        name="Saleor Invoices"
+        author="By Saleor Commerce"
+        rightColumnContent={
+          <div className={styles.buttonsGrid}>
+            <Button
+              variant="secondary"
+              startIcon={<GitHub />}
+              onClick={() => {
+                openInNewTab("https://github.com/saleor/saleor-app-invoices");
+              }}
+            >
+              Repository
+            </Button>
+            <Button
+              startIcon={<OfflineBoltOutlined />}
+              variant="secondary"
+              onClick={() => {
+                openInNewTab("https://github.com/saleor/apps/discussions");
+              }}
+            >
+              Request a feature
+            </Button>
+          </div>
+        }
+      />
+      <ChannelsConfiguration />
     </div>
   );
 };
