@@ -3,6 +3,8 @@ import { useAppBridge } from "@saleor/app-sdk/app-bridge";
 import { useEffect } from "react";
 import { useIsMounted } from "usehooks-ts";
 import { useRouter } from "next/router";
+import { isInIframe } from "../lib/is-in-iframe";
+import { LinearProgress } from "@material-ui/core";
 
 const IndexPage: NextPage = () => {
   const { appBridgeState } = useAppBridge();
@@ -14,6 +16,10 @@ const IndexPage: NextPage = () => {
       replace("/configuration");
     }
   }, [isMounted, appBridgeState?.ready]);
+
+  if (isInIframe()) {
+    return <LinearProgress />;
+  }
 
   return (
     <div>
