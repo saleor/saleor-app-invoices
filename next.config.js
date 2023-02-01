@@ -27,13 +27,6 @@ const moduleExports = {
     ignoreDuringBuilds: true,
   },
   reactStrictMode: true,
-  experimental: {
-    /**
-     * TODO
-     * This is temporary to support migration, using both legacy and "new" macaw
-     */
-    esmExternals: false,
-  },
 };
 
 const sentryWebpackPluginOptions = {
