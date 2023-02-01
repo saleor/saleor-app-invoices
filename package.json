@@ -20,7 +20,7 @@
     "@material-ui/icons": "^4.11.3",
     "@material-ui/lab": "4.0.0-alpha.61",
     "@saleor/app-sdk": "0.27.1",
-    "@saleor/macaw-ui": "^0.7.2",
+    "@saleor/macaw-ui": "^0.8.0-pre.13",
     "@sentry/nextjs": "^7.31.1",
     "@tanstack/react-query": "^4.19.1",
     "@trpc/client": "^10.9.0",
