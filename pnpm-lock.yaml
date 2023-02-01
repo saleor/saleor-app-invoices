@@ -13,7 +13,7 @@ specifiers:
   '@material-ui/icons': ^4.11.3
   '@material-ui/lab': 4.0.0-alpha.61
   '@saleor/app-sdk': 0.27.1
-  '@saleor/macaw-ui': ^0.8.0-pre.13
+  '@saleor/macaw-ui': 0.7.2
   '@sentry/nextjs': ^7.31.1
   '@tanstack/react-query': ^4.19.1
   '@trpc/client': ^10.9.0
@@ -59,7 +59,7 @@ dependencies:
   '@material-ui/icons': 4.11.3_3mlwvtnnvz4efep55wa5m5dc4e
   '@material-ui/lab': 4.0.0-alpha.61_3mlwvtnnvz4efep55wa5m5dc4e
   '@saleor/app-sdk': 0.27.1_6jx7hpii6hgsrmhxgqrmo3277u
-  '@saleor/macaw-ui': 0.8.0-pre.13_rj7ozvcq3uehdlnj3cbwzbi5ce
+  '@saleor/macaw-ui': 0.7.2_k2kuy4f2rkqfztjzphbs3himfi
   '@sentry/nextjs': 7.31.1_next@13.0.6+react@18.2.0
   '@tanstack/react-query': 4.20.4_biqbaboplfbrettd7655fr4n2y
   '@trpc/client': 10.9.0_@trpc+server@10.9.0
@@ -1983,14 +1983,21 @@ packages:
       - supports-color
     dev: false
 
-  /@saleor/macaw-ui/0.8.0-pre.13_rj7ozvcq3uehdlnj3cbwzbi5ce:
-    resolution: {integrity: sha512-HSK9MufjzgyaqQohNh7GW7poNNYefmGepf5y+hyMSE8uRmVSB0kZACVB3+LW+yHfe7d/oWt0O2010Mv/DlFmcA==}
+  /@saleor/macaw-ui/0.7.2_k2kuy4f2rkqfztjzphbs3himfi:
+    resolution: {integrity: sha512-Fli7fhTWuHu7q2CzxwTUpB4x9HYaxHSAzCLZLA23VY1ieIWbCxbsXadMiMGWp/nuYitswMr6JXMm+1SDe9K8LQ==}
     engines: {node: '>=16 <19'}
     peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
-      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+      '@material-ui/core': ^4.11.2
+      '@material-ui/icons': ^4.11.2
+      '@material-ui/lab': ^4.0.0-alpha.58
+      react: ^16.8.0 || ^17.0.0
+      react-dom: ^16.8.0 || ^17.0.0
+      react-helmet: ^6.1.0
     dependencies:
       '@floating-ui/react-dom-interactions': 0.5.0_rj7ozvcq3uehdlnj3cbwzbi5ce
+      '@material-ui/core': 4.12.4_rj7ozvcq3uehdlnj3cbwzbi5ce
+      '@material-ui/icons': 4.11.3_3mlwvtnnvz4efep55wa5m5dc4e
+      '@material-ui/lab': 4.0.0-alpha.61_3mlwvtnnvz4efep55wa5m5dc4e
       clsx: 1.2.1
       downshift: 6.1.12_react@18.2.0
       lodash: 4.17.21
